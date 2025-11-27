@@ -1,66 +1,41 @@
-import Image from "next/image";
 import styles from "./page.module.css";
+import ActivityCard from "@/components/ActivityCard";
+import { Mail, Camera, Gamepad2 } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className={styles.main}>
+      <div className={styles.hero}>
+        <h1 className={styles.title}>Ramadhan Interactive Hub</h1>
+        <p className={styles.subtitle}>
+          Celebrate the holy month with Leverate. Create personalized greetings, 
+          generate unique brand ads, or challenge yourself in our Takjil game.
+        </p>
+      </div>
+
+      <div className={styles.grid}>
+        <ActivityCard
+          title="Surat Ucapan Lebaran"
+          description="Create a heartfelt, AI-generated Eid greeting letter with a custom design."
+          icon={Mail}
+          href="/activity-1"
+          color="#4CAF50" // Green for religious/peaceful vibe
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <ActivityCard
+          title="Foto Iklan Generator"
+          description="Star in your own brand advertisement. Choose an industry and let AI do the rest."
+          icon={Camera}
+          href="/activity-2"
+          color="#2196F3" // Blue for professional/business vibe
+        />
+        <ActivityCard
+          title="Game Rebutan Takjil"
+          description="Catch falling takjil snacks in this interactive hand-tracking game."
+          icon={Gamepad2}
+          href="/activity-3"
+          color="#FF9800" // Orange for fun/energy
+        />
+      </div>
+    </main>
   );
 }

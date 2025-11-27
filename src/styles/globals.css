@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  --color-primary: #1a237e;
+  --color-secondary: #ffd700;
+  --color-gold: #ffd700;
+  --color-accent: #00bcd4;
+
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-serif: 'Playfair Display', Georgia, serif;
+}
+
+@layer base {
+  * {
+    @apply box-border m-0 p-0;
+  }
+
+  html,
+  body {
+    @apply max-w-screen overflow-x-hidden font-sans bg-background text-foreground;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .grid-cols-3 {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+  }
+
+  .btn {
+    @apply px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all border-none;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:opacity-90;
+  }
+
+  .card {
+    @apply bg-white/5 border border-white/10 rounded-2xl p-6 transition-transform hover:-translate-y-1 hover:border-secondary;
+  }
+}
