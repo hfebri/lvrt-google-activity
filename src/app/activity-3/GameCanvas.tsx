@@ -40,6 +40,8 @@ interface Animation {
 const TAKJIL_TYPES = ["Tahu", "Tempe", "Bakwan", "Singkong", "Risol"];
 const COLORS = ["#FF5722", "#FFC107", "#8BC34A", "#795548", "#FF9800"];
 const PRICE_PER_ITEM = 1000;
+const GAME_DURATION = 30; // Game duration in seconds
+const TAKJIL_SIZE = 100; // Size of gorengan/takjil items in pixels
 
 // Define 4 spawn points matching the plates on stall.png (full screen)
 // Plates are on the middle shelf at approximately 55% height
@@ -124,7 +126,8 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          endGame();
+          // Delay endGame to avoid state update during render
+          setTimeout(() => endGame(), 0);
           return 0;
         }
         return prev - 1;
@@ -191,11 +194,15 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         const spotIndex = availableSpots[Math.floor(Math.random() * availableSpots.length)];
         const typeIndex = Math.floor(Math.random() * TAKJIL_TYPES.length);
 
-        // NPC difficulty increases over time (starts slower, gets faster)
-        // Start: 4000ms (4 seconds - easy)
-        // End: 1500ms (1.5 seconds - very hard)
-        const gameProgress = Math.min(timeLeft / GAME_DURATION, 1); // 1 at start, 0 at end
-        const npcDuration = 4000 - (gameProgress * 2500); // 4000ms -> 1500ms
+        // NPC difficulty increases over time (starts slower, gets faster in last 15 seconds)
+        // First 15 seconds (30-15): 4000ms (4 seconds - easy, slow)
+        // Last 15 seconds (15-0): 4000ms -> 1500ms (getting faster)
+        let npcDuration = 4000; // Default slow speed
+        if (timeLeft <= 15) {
+          // In last 15 seconds, speed increases: 4000ms -> 1500ms
+          const lastPhaseProgress = timeLeft / 15; // 1 at second 15, 0 at second 0
+          npcDuration = 1500 + (lastPhaseProgress * 2500); // 4000ms -> 1500ms
+        }
 
         takjils.current.push({
           id: Math.random(),
@@ -216,7 +223,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       const spot = SPAWN_POINTS[t.positionIndex];
       const x = spot.x * width;
       const y = spot.y * height;
-      const size = 60;
+      const size = TAKJIL_SIZE;
 
       // Check expiry (Stolen Logic)
       if (timestamp - t.spawnTime > t.duration) {
@@ -320,7 +327,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
             const spot = SPAWN_POINTS[t.positionIndex];
             const tx = spot.x * width;
             const ty = spot.y * height;
-            const size = 60;
+            const size = TAKJIL_SIZE;
 
             if (
               cursorX > tx - size/2 && 
@@ -372,7 +379,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         const currentY = (anim.startY || 0) + ((anim.endY || 0) - (anim.startY || 0)) * ease;
 
         // Draw Item being stolen with pixel art
-        const size = 60;
+        const size = TAKJIL_SIZE;
         const foodImg = foodImages.current[anim.takjilType || ""];
 
         if (foodImg) {
