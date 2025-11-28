@@ -41,15 +41,15 @@ const TAKJIL_TYPES = ["Tahu", "Tempe", "Bakwan", "Singkong", "Risol"];
 const COLORS = ["#FF5722", "#FFC107", "#8BC34A", "#795548", "#FF9800"];
 const PRICE_PER_ITEM = 1000;
 const GAME_DURATION = 30; // Game duration in seconds
-const TAKJIL_SIZE = 100; // Size of gorengan/takjil items in pixels
+const TAKJIL_SIZE = 150; // Size of gorengan/takjil items in pixels
 
 // Define 4 spawn points matching the plates on stall.png (full screen)
-// Plates are on the middle shelf at approximately 55% height
+// Plates are positioned lower to sit on the actual plates
 const SPAWN_POINTS = [
-  { x: 0.25, y: 0.55 }, // Left plate
-  { x: 0.42, y: 0.55 }, // Center-left plate
-  { x: 0.58, y: 0.55 }, // Center-right plate
-  { x: 0.75, y: 0.55 }, // Right plate
+  { x: 0.25, y: 0.60 }, // Left plate
+  { x: 0.42, y: 0.60 }, // Center-left plate
+  { x: 0.58, y: 0.60 }, // Center-right plate
+  { x: 0.75, y: 0.60 }, // Right plate
 ];
 
 export default function GameCanvas({ onEnd }: GameCanvasProps) {
