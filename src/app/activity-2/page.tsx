@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Star, Moon } from "lucide-react";
 import IndustrySelector from "./IndustrySelector";
 import WebcamCapture from "./WebcamCapture";
 import PosterDisplay from "./PosterDisplay";
@@ -14,6 +14,8 @@ export default function Activity2Page() {
   const [selectedIndustry, setSelectedIndustry] = useState("");
   const [capturedImage, setCapturedImage] = useState("");
   const [result, setResult] = useState<{ posterUrl: string; brandName: string; tagline: string; sharingText?: SocialSharingText } | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState("Initializing...");
 
   const handleIndustrySelect = (industry: string) => {
     setSelectedIndustry(industry);
@@ -23,12 +25,54 @@ export default function Activity2Page() {
   const handleCapture = async (imageSrc: string) => {
     setCapturedImage(imageSrc);
     setStep("loading");
+    setProgress(0);
     
+    // Simulate progress
+    const simulateProgress = (start: number, end: number, duration: number) => {
+      const increment = (end - start) / (duration / 100);
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          const next = prev + increment;
+          if (next >= end) {
+            clearInterval(interval);
+            return end;
+          }
+          return next;
+        });
+      }, 100);
+      return interval;
+    };
+
     try {
+      setLoadingText("Analyzing your photo...");
+      const p1 = simulateProgress(0, 30, 2000);
+      
+      // Wait a bit to simulate analysis
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      clearInterval(p1);
+      setProgress(30);
+
+      setLoadingText("Generating brand concept...");
+      const p2 = simulateProgress(30, 60, 3000);
+      
       const data = await generatePoster(selectedIndustry, imageSrc);
+      clearInterval(p2);
+      setProgress(60);
+
+      setLoadingText("Designing final poster...");
+      const p3 = simulateProgress(60, 95, 4000);
+      
+      // Artificial delay for effect if generation was too fast
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      clearInterval(p3);
+      setProgress(100);
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
       setResult(data);
       setStep("result");
     } catch (error) {
+      console.error(error);
       alert("Failed to generate poster. Please try again.");
       setStep("camera");
     }
@@ -39,55 +83,82 @@ export default function Activity2Page() {
     setSelectedIndustry("");
     setCapturedImage("");
     setResult(null);
+    setProgress(0);
   };
 
   return (
-    <main className="container" style={{ padding: "2rem 1rem", minHeight: "100vh" }}>
-      <Link href="/" style={{ display: "inline-flex", alignItems: "center", marginBottom: "2rem", color: "#a0a0a0" }}>
-        <ArrowLeft size={20} style={{ marginRight: "0.5rem" }} />
-        Back to Home
-      </Link>
+    <main className="min-h-screen py-12 px-4 relative overflow-hidden">
+       {/* Background Decorative Elements */}
+       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-20 right-10 text-primary/10 animate-[float_8s_ease-in-out_infinite]">
+          <Star size={120} />
+        </div>
+        <div className="absolute bottom-40 left-20 text-primary/5 animate-[float_12s_ease-in-out_infinite_reverse]">
+          <Moon size={80} />
+        </div>
+      </div>
 
-      <div className="flex-center" style={{ flexDirection: "column" }}>
-        <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "2.5rem", marginBottom: "1rem", color: "var(--secondary)", textAlign: "center" }}>
-          Foto Iklan Generator
-        </h1>
-        
-        {step === "industry" && (
-          <>
-            <p style={{ color: "#a0a0a0", marginBottom: "3rem", textAlign: "center" }}>
-              Choose an industry to start your brand campaign.
+      <div className="container relative z-10">
+        <div className="mb-12">
+          <Link href="/" className="inline-flex items-center text-primary hover:text-primary-hover transition-colors mb-6 group">
+            <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
+            Back to Home
+          </Link>
+          
+          <div className="text-center max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-hover to-white">
+              Brand Star Generator
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Step into the spotlight. Choose an industry and let AI transform your photo into a stunning Ramadan campaign.
             </p>
-            <IndustrySelector onSelect={handleIndustrySelect} />
-          </>
-        )}
-
-        {step === "camera" && (
-          <>
-            <p style={{ color: "#a0a0a0", marginBottom: "2rem", textAlign: "center" }}>
-              Take a photo for your advertisement. Smile!
-            </p>
-            <WebcamCapture onCapture={handleCapture} />
-          </>
-        )}
-
-        {step === "loading" && (
-          <div style={{ textAlign: "center", padding: "4rem" }}>
-            <Loader2 size={48} className="animate-spin" style={{ color: "var(--secondary)", marginBottom: "1rem" }} />
-            <p style={{ fontSize: "1.2rem" }}>Generating your campaign...</p>
-            <p style={{ color: "#a0a0a0", marginTop: "0.5rem" }}>Creating brand identity, designing poster, and applying magic.</p>
           </div>
-        )}
+        </div>
 
-        {step === "result" && result && (
-          <PosterDisplay
-            posterUrl={result.posterUrl}
-            brandName={result.brandName}
-            tagline={result.tagline}
-            sharingText={result.sharingText}
-            onReset={handleReset}
-          />
-        )}
+        <div className="flex justify-center min-h-[500px]">
+          {step === "industry" && (
+            <div className="w-full">
+              <h2 className="text-2xl font-serif text-center text-white mb-8">Choose Your Industry</h2>
+              <IndustrySelector onSelect={handleIndustrySelect} />
+            </div>
+          )}
+
+          {step === "camera" && (
+            <div className="w-full">
+              <h2 className="text-2xl font-serif text-center text-white mb-8">Take Your Photo</h2>
+              <WebcamCapture onCapture={handleCapture} />
+            </div>
+          )}
+
+          {step === "loading" && (
+            <div className="flex flex-col items-center justify-center p-12 text-center w-full max-w-md mx-auto bg-surface/50 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                <Loader2 className="relative text-primary animate-spin" size={64} />
+              </div>
+              <h3 className="text-2xl font-serif text-primary mb-2">{loadingText}</h3>
+              <p className="text-gray-400 mb-8 text-sm">AI is crafting your masterpiece...</p>
+              
+              <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary to-primary-hover transition-all duration-300 ease-out"
+                  style={{ width: `${progress}%` }} 
+                />
+              </div>
+              <p className="mt-2 text-primary/80 font-mono text-sm">{Math.round(progress)}%</p>
+            </div>
+          )}
+
+          {step === "result" && result && (
+            <PosterDisplay
+              posterUrl={result.posterUrl}
+              brandName={result.brandName}
+              tagline={result.tagline}
+              sharingText={result.sharingText}
+              onReset={handleReset}
+            />
+          )}
+        </div>
       </div>
     </main>
   );

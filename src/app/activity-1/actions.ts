@@ -43,7 +43,7 @@ export async function generateLetter(data: any) {
 
     const { letter, imagePrompt } = JSON.parse(jsonMatch[0]);
     console.log(`📝 Letter: ${letter.substring(0, 50)}...`);
-    console.log(`🎨 Image prompt: ${imagePrompt.substring(0, 80)}...`);
+    console.log(`🎨 Image prompt: ${imagePrompt}`);
 
     console.timeEnd('⏱️  Letter Generation');
     console.log('✨ Letter generation complete!\n');
@@ -67,13 +67,15 @@ export async function generateImage(prompt: string) {
     const enhancedPrompt = `${prompt}
 
     Additional requirements:
-    - Center area should be clear/subtle for text overlay
-    - Beautiful Ramadan/Eid theme
+    - Center area should be clear/subtle for text overlay with elegant serif font styling
+    - Beautiful Ramadan/Eid theme with sophisticated, warm aesthetics
+    - Font Style: Elegant serif typography (like Crimson Text, Libre Baskerville, Cormorant Garamond style) - NOT generic Times New Roman
     - No text or watermarks in the image
-    - High quality, vibrant colors with Islamic patterns`;
+    - High quality, vibrant colors with Islamic patterns
+    - Poetic, refined visual style matching elegant Indonesian greetings`;
 
     console.log('🎨 Using Gemini Image Preview (1K quality, 9:16 aspect ratio)...');
-    console.log(`📝 Enhanced prompt: ${enhancedPrompt.substring(0, 80)}...`);
+    console.log(`📝 Enhanced prompt: ${enhancedPrompt}...`);
 
     const startTime = Date.now();
 

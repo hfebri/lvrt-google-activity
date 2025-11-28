@@ -1,5 +1,4 @@
 import Link from "next/link";
-import styles from "./ActivityCard.module.css";
 import { LucideIcon } from "lucide-react";
 
 interface ActivityCardProps {
@@ -7,19 +6,33 @@ interface ActivityCardProps {
   description: string;
   icon: LucideIcon;
   href: string;
-  color: string;
+  color?: string; // Kept for backward compatibility but might override for theme consistency
 }
 
-export default function ActivityCard({ title, description, icon: Icon, href, color }: ActivityCardProps) {
+export default function ActivityCard({ title, description, icon: Icon, href }: ActivityCardProps) {
   return (
-    <Link href={href} className={styles.card} style={{ borderColor: color }}>
-      <div className={styles.iconWrapper} style={{ backgroundColor: color }}>
-        <Icon size={32} color="white" />
-      </div>
-      <h3 className={styles.title}>{title}</h3>
-      <p className={styles.description}>{description}</p>
-      <div className={styles.arrow} style={{ color: color }}>
-        Start Activity &rarr;
+    <Link href={href} className="group relative block h-full">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-xl" />
+      
+      <div className="card h-full flex flex-col items-center text-center relative z-10 border border-white/5 group-hover:border-primary/50 overflow-hidden">
+        {/* Decorative circle background for icon */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all duration-500" />
+        
+        <div className="mb-6 p-4 rounded-full bg-surface border border-white/10 shadow-lg group-hover:scale-110 group-hover:border-primary/50 transition-all duration-300 relative">
+          <Icon size={32} className="text-primary group-hover:text-foreground transition-colors" />
+        </div>
+        
+        <h3 className="text-2xl font-serif font-bold mb-3 text-primary group-hover:text-primary-hover transition-colors">
+          {title}
+        </h3>
+        
+        <p className="text-gray-400 mb-8 leading-relaxed group-hover:text-gray-300 transition-colors">
+          {description}
+        </p>
+        
+        <div className="mt-auto opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 font-semibold text-primary flex items-center gap-2">
+          Start Experience <span className="text-xl">→</span>
+        </div>
       </div>
     </Link>
   );

@@ -130,6 +130,88 @@ export async function generateImage(
 }
 
 /**
+ * Generate images with user photo input using Gemini 2.5 Flash Image (FASTER!)
+ * This allows the AI to incorporate the user's photo into the generated image
+ * Uses the faster Gemini 2.5 Flash Image model instead of 3 Pro Image Preview
+ */
+export async function generateImageWithPhoto(
+  prompt: string,
+  userPhotoBase64: string,
+  options?: {
+    imageSize?: '1K' | '2K' | '4K';
+    aspectRatio?: '1:1' | '3:4' | '4:3' | '9:16' | '16:9';
+    photoMimeType?: string;
+  }
+): Promise<{ imageUrl: string; base64Data: string; mimeType: string }> {
+  const config: any = {
+    responseModalities: ['IMAGE', 'TEXT'],
+    imageConfig: {
+      aspectRatio: '9:16',
+    },
+  };
+
+  const model = 'gemini-2.5-flash-image'; // Changed to faster Flash model
+
+  // Extract base64 data without data URL prefix if present
+  const base64Data = userPhotoBase64.includes('base64,')
+    ? userPhotoBase64.split('base64,')[1]
+    : userPhotoBase64;
+
+  const contents = [
+    {
+      role: 'user',
+      parts: [
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: options?.photoMimeType || 'image/jpeg',
+          },
+        },
+        {
+          text: prompt,
+        },
+      ],
+    },
+  ];
+
+  const response = await ai.models.generateContentStream({
+    model,
+    config,
+    contents,
+  });
+
+  let imageData: { data: string; mimeType: string } | null = null;
+
+  for await (const chunk of response) {
+    if (!chunk.candidates || !chunk.candidates[0]?.content?.parts) {
+      continue;
+    }
+
+    const inlineData = chunk.candidates[0].content.parts[0]?.inlineData;
+    if (inlineData) {
+      imageData = {
+        data: inlineData.data || '',
+        mimeType: inlineData.mimeType || 'image/png',
+      };
+      break; // Get first image
+    }
+  }
+
+  if (!imageData) {
+    throw new Error('No image was generated');
+  }
+
+  // Convert to data URL for browser display
+  const imageUrl = `data:${imageData.mimeType};base64,${imageData.data}`;
+
+  return {
+    imageUrl,
+    base64Data: imageData.data,
+    mimeType: imageData.mimeType,
+  };
+}
+
+/**
  * Generate multiple images in sequence
  */
 export async function generateMultipleImages(

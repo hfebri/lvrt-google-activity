@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
-import styles from "./PosterDisplay.module.css";
-import html2canvas from "html2canvas";
+import { useRef } from "react";
+import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
-import { Download, RefreshCw, Share2, Copy, Check } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import type { SocialSharingText } from "@/lib/socialSharingTypes";
 
 interface PosterDisplayProps {
@@ -15,109 +14,55 @@ interface PosterDisplayProps {
   sharingText?: SocialSharingText;
 }
 
-export default function PosterDisplay({ posterUrl, brandName, tagline, onReset, sharingText }: PosterDisplayProps) {
+export default function PosterDisplay({ posterUrl, brandName, tagline }: PosterDisplayProps) {
   const posterRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
-  const [showSharing, setShowSharing] = useState(false);
-
-  const handleDownload = async () => {
-    if (posterRef.current) {
-      try {
-        const canvas = await html2canvas(posterRef.current, {
-          useCORS: true,
-          scale: 2,
-        });
-        const link = document.createElement("a");
-        link.download = "iklan-ramadan.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      } catch (error) {
-        console.error("Download failed:", error);
-        alert("Failed to download image.");
-      }
-    }
-  };
-
-  const handleCopySharing = () => {
-    if (!sharingText) return;
-
-    const text = `${sharingText.caption}\n\n${sharingText.hashtags.join(" ")}\n\n${sharingText.callToAction}`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.previewWrapper}>
-        <div className={styles.poster} ref={posterRef}>
-          <img src={posterUrl} alt="Generated Poster" className={styles.background} crossOrigin="anonymous" />
-          <div className={styles.overlay}>
-            <div className={styles.brandInfo}>
-              <h2 className={styles.brandName}>{brandName}</h2>
-              <p className={styles.tagline}>{tagline}</p>
-            </div>
+    <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 items-start justify-center animate-in fade-in duration-700">
+      {/* Preview Section */}
+      <div className="w-full max-w-[400px] mx-auto lg:mx-0 relative group">
+        <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        <div 
+          ref={posterRef}
+          className="relative aspect-[9/16] w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 group-hover:scale-[1.02] transition-transform duration-500"
+        >
+          <img 
+            src={posterUrl} 
+            alt="Generated Poster" 
+            className="absolute inset-0 w-full h-full object-cover" 
+            crossOrigin="anonymous" 
+          />
+          
+          {/* Overlay for Brand Info - rendered on the image */}
+          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-8 pt-24 text-center">
+            <h2 className="text-3xl font-serif font-bold text-primary mb-2 drop-shadow-lg">{brandName}</h2>
+            <p className="text-white font-medium tracking-wide drop-shadow-md">{tagline}</p>
           </div>
         </div>
       </div>
 
-      <div className={styles.controls}>
-        <div className={styles.qrSection}>
-          <p>Scan to Download</p>
-          <div className={styles.qrCode}>
-            <QRCodeSVG value="https://leverate.com" size={100} />
+      {/* Controls Section */}
+      <div className="flex-1 w-full max-w-md mx-auto lg:mx-0 space-y-8">
+        <div className="text-center lg:text-left">
+          <h2 className="text-3xl font-serif text-primary mb-2">You're the Star!</h2>
+          <p className="text-gray-400">Your professional Ramadan campaign is ready.</p>
+        </div>
+
+        <div className="glass-panel p-6 space-y-6">
+          <div className="flex flex-col gap-4">
+            <Link href="/" className="btn btn-primary w-full no-underline">
+              <RotateCcw size={20} /> Start Over
+            </Link>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3 w-full justify-center">
-          <button
-            onClick={handleDownload}
-            className="flex-1 min-w-[160px] flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-          >
-            <Download size={20} />
-            Download Poster
-          </button>
-          {sharingText && (
-            <button
-              onClick={() => setShowSharing(!showSharing)}
-              className="flex-1 min-w-[160px] flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors border border-white/20"
-            >
-              <Share2 size={20} />
-              Share
-            </button>
-          )}
-          <button
-            onClick={onReset}
-            className="flex-1 min-w-[160px] flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors border border-white/20"
-          >
-            <RefreshCw size={20} />
-            Create Another
-          </button>
-        </div>
-
-        {showSharing && sharingText && (
-          <div className={styles.sharingBox}>
-            <h4>Share on Social Media</h4>
-            <div className={styles.sharingContent}>
-              <p>{sharingText.caption}</p>
-              <p className={styles.hashtags}>{sharingText.hashtags.join(" ")}</p>
-              <p className={styles.cta}>{sharingText.callToAction}</p>
-            </div>
-            <button onClick={handleCopySharing} className="btn btn-primary">
-              {copied ? (
-                <>
-                  <Check size={20} style={{ marginRight: "0.5rem" }} />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy size={20} style={{ marginRight: "0.5rem" }} />
-                  Copy Sharing Text
-                </>
-              )}
-            </button>
+        <div className="glass-panel p-6 text-center">
+          <p className="text-gray-400 text-sm mb-4 uppercase tracking-widest">Scan to Download</p>
+          <div className="bg-white p-4 rounded-xl inline-block shadow-lg">
+            <QRCodeSVG value="https://leverate.com" size={120} />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

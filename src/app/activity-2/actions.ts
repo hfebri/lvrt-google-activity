@@ -1,15 +1,21 @@
 "use server";
 
 import { generateText } from "@/lib/gemini";
-import { generatePosterSharingText } from "@/lib/socialSharing";
 
 export async function generatePoster(industry: string, imageBase64: string) {
+  console.log('\n🚀 [Activity 2] Starting poster generation...');
+  console.time('⏱️  Total Poster Generation');
+
   // 1. Generate Concept & Brand Name using Gemini 3 Pro
   let brandName = "Leverate";
   let tagline = "Elevate Your Brand";
   let concept = "A modern, sleek advertisement.";
 
   try {
+    console.log(`📋 Industry selected: ${industry}`);
+    console.log('💡 Generating brand concept with Gemini 2.5 Flash...');
+    console.time('⏱️  Brand Concept Generation');
+
     const prompt = `
       Create a fictional brand name, tagline, and visual concept for a Ramadan advertisement in the ${industry} industry.
 
@@ -29,8 +35,10 @@ export async function generatePoster(industry: string, imageBase64: string) {
       }
     `;
 
+    const startBrandTime = Date.now();
     // Use Gemini 2.5 Flash for fast, high-quality brand concepts
     const text = await generateText(prompt);
+    const brandTime = ((Date.now() - startBrandTime) / 1000).toFixed(2);
 
     // Parse JSON response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -39,50 +47,92 @@ export async function generatePoster(industry: string, imageBase64: string) {
       brandName = data.brandName;
       tagline = data.tagline;
       concept = data.concept;
+
+      console.log(`✅ Brand concept generated in ${brandTime}s`);
+      console.log(`   📛 Brand: ${brandName}`);
+      console.log(`   💬 Tagline: ${tagline}`);
+      console.log(`   🎨 Concept: ${concept.substring(0, 60)}...`);
+      console.timeEnd('⏱️  Brand Concept Generation');
     }
   } catch (e) {
-    console.error("Gemini generation failed", e);
+    console.error("❌ Gemini generation failed", e);
     throw new Error("Failed to generate brand concept");
   }
 
-  // 2. Generate Poster Image using Gemini Image Generation
+  // 2. Generate Poster Image using Gemini Image Generation WITH USER PHOTO
   try {
-    const { generateImage } = await import("@/lib/gemini");
+    console.log('\n🖼️  Generating poster image with user photo...');
+    console.time('⏱️  Poster Image Generation');
+
+    const { generateImageWithPhoto } = await import("@/lib/gemini");
 
     // Create detailed prompt for the poster
-    const imagePrompt = `Professional advertisement poster for ${brandName}.
+    const imagePrompt = `Create a professional advertisement poster for ${brandName}.
 
     Tagline: "${tagline}"
     Concept: ${concept}
     Industry: ${industry}
     Theme: Ramadan/Eid celebration
 
+    CRITICAL REQUIREMENTS - CHARACTER CONSISTENCY:
+    - The provided photo shows ONE PERSON - this is the ONLY person who should be the main subject
+    - KEEP THE EXACT SAME PERSON from the provided photo as the SOLE main subject/model
+    - PRESERVE their facial features, face shape, skin tone, and overall appearance EXACTLY
+    - DO NOT change their face, eyes, nose, mouth, or any facial characteristics
+    - The person should be CLEARLY RECOGNIZABLE as the same individual from the input photo
+    - DO NOT add other people's faces in the foreground or as main subjects
+    - Any background people should be minimal, blurred, or silhouettes only
+    - Only enhance the background, setting, and surrounding elements
+    - Keep their natural appearance - do not alter their identity
+
+    TEXT REQUIREMENTS:
+    - DO NOT add any text, taglines, or words to the image
+    - NO text overlay at the bottom or anywhere on the poster
+    - The image should be purely visual with decorative elements only
+    - Text will be added separately later
+
     Visual requirements:
-    - 9:16 portrait aspect ratio (poster format)
-    - Feature the person from the provided context as brand ambassador
-    - Modern, professional advertising style
-    - Vibrant Islamic/Ramadan visual elements
-    - Clean composition with space for brand text overlay
-    - High quality, commercial advertisement aesthetic
-    - Warm, festive color palette
-    - Industry-appropriate setting and mood`;
+    - Feature the ONE person from the provided photo prominently as the sole brand ambassador
+    - Modern, professional advertising style with commercial aesthetic
+    - Vibrant Islamic/Ramadan visual elements (crescent moon, lanterns, mosque silhouettes)
+    - Clean composition with decorative borders and patterns
+    - Warm, festive color palette (gold, green, deep blue)
+    - Industry-appropriate setting and mood for ${industry}
+    - High quality, magazine-worthy advertisement
+    - The person should look professional and engaging with proper lighting
+    - Add subtle brand elements and Ramadan decorative patterns (geometric shapes, lanterns, crescents)
+    - Professional studio lighting and composition
+    - Focus should be on the ONE person from the input photo`;
 
-    // Generate the poster using Gemini 3 Pro Image Preview
-    const result = await generateImage(imagePrompt, {
-      imageSize: '2K', // Higher quality for poster
+    console.log('⚡ Using Gemini 2.5 Flash Image (MUCH FASTER than 3 Pro!)...');
+    console.log(`📝 Prompt: ${imagePrompt.substring(0, 100)}...`);
+    console.log(`📸 User photo size: ${(imageBase64.length / 1024).toFixed(2)} KB`);
+    console.log('⏱️  Expected time: 15-40 seconds (Flash model is optimized for speed)');
+
+    const startImageTime = Date.now();
+    // Generate the poster using Gemini 2.5 Flash Image WITH user photo (MUCH FASTER!)
+    const result = await generateImageWithPhoto(imagePrompt, imageBase64, {
+      imageSize: '1K', // Not used by Flash model, but kept for compatibility
+      aspectRatio: '9:16', // Not used by Flash model, but kept for compatibility
+      photoMimeType: 'image/jpeg',
     });
+    const imageTime = ((Date.now() - startImageTime) / 1000).toFixed(2);
 
-    // Generate social sharing text
-    const sharingText = await generatePosterSharingText(brandName, tagline, industry);
+    console.log(`✅ Poster image generated in ${imageTime}s`);
+    console.log(`📊 Output image size: ${(result.base64Data.length / 1024).toFixed(2)} KB (base64)`);
+    console.timeEnd('⏱️  Poster Image Generation');
+
+    console.timeEnd('⏱️  Total Poster Generation');
+    console.log('✨ Poster generation complete!\n');
 
     return {
       posterUrl: result.imageUrl,
       brandName,
       tagline,
-      sharingText,
+      sharingText: undefined,
     };
   } catch (error) {
-    console.error("Error generating poster:", error);
+    console.error("❌ Error generating poster:", error);
     throw new Error("Failed to generate poster image");
   }
 }
