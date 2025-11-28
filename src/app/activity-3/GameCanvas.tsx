@@ -37,7 +37,7 @@ interface Animation {
   duration: number;
 }
 
-const TAKJIL_TYPES = ["Tahu", "Cireng", "Bakwan", "Singkong", "Risol"];
+const TAKJIL_TYPES = ["Tahu", "Tempe", "Bakwan", "Singkong", "Risol"];
 const COLORS = ["#FF5722", "#FFC107", "#8BC34A", "#795548", "#FF9800"];
 const PRICE_PER_ITEM = 1000;
 
@@ -67,6 +67,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
   const handResults = useRef<any>(null);
   const isPinchingRef = useRef(false);
   const stallImage = useRef<HTMLImageElement | null>(null);
+  const foodImages = useRef<Record<string, HTMLImageElement>>({});
 
   useEffect(() => {
     const initTracker = async () => {
@@ -83,6 +84,15 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
     img.onload = () => {
       stallImage.current = img;
     };
+
+    // Load food pixel art images
+    TAKJIL_TYPES.forEach((foodType) => {
+      const foodImg = new Image();
+      foodImg.src = `/${foodType.toLowerCase()}.png`;
+      foodImg.onload = () => {
+        foodImages.current[foodType] = foodImg;
+      };
+    });
 
     const handleHandResults = (e: any) => {
       handResults.current = e.detail;
@@ -235,9 +245,9 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         return;
       }
 
-      // Draw Takjil
-      ctx.fillStyle = COLORS[TAKJIL_TYPES.indexOf(t.type)];
-      
+      // Draw Takjil with pixel art
+      const foodImg = foodImages.current[t.type];
+
       // Add a glow if it's about to disappear (Warning)
       const timeLeft = t.duration - (timestamp - t.spawnTime);
       if (timeLeft < 1000) {
@@ -246,15 +256,16 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         ctx.globalAlpha = pulse;
       }
 
-      ctx.beginPath();
-      ctx.roundRect(x - size/2, y - size/2, size, size, 12);
-      ctx.fill();
-      
-      // Detail
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.beginPath();
-      ctx.ellipse(x - 10, y - 10, 10, 5, -0.5, 0, 2 * Math.PI);
-      ctx.fill();
+      if (foodImg) {
+        // Draw pixel art image
+        ctx.drawImage(foodImg, x - size/2, y - size/2, size, size);
+      } else {
+        // Fallback to colored square if image not loaded yet
+        ctx.fillStyle = COLORS[TAKJIL_TYPES.indexOf(t.type)];
+        ctx.beginPath();
+        ctx.roundRect(x - size/2, y - size/2, size, size, 12);
+        ctx.fill();
+      }
 
       ctx.globalAlpha = 1.0;
       
@@ -360,12 +371,19 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         const currentX = (anim.startX || 0) + ((anim.endX || 0) - (anim.startX || 0)) * ease;
         const currentY = (anim.startY || 0) + ((anim.endY || 0) - (anim.startY || 0)) * ease;
 
-        // Draw Item being stolen
+        // Draw Item being stolen with pixel art
         const size = 60;
-        ctx.fillStyle = COLORS[TAKJIL_TYPES.indexOf(anim.takjilType || "")];
-        ctx.beginPath();
-        ctx.roundRect(currentX - size/2, currentY - size/2, size, size, 12);
-        ctx.fill();
+        const foodImg = foodImages.current[anim.takjilType || ""];
+
+        if (foodImg) {
+          ctx.drawImage(foodImg, currentX - size/2, currentY - size/2, size, size);
+        } else {
+          // Fallback to colored square
+          ctx.fillStyle = COLORS[TAKJIL_TYPES.indexOf(anim.takjilType || "")];
+          ctx.beginPath();
+          ctx.roundRect(currentX - size/2, currentY - size/2, size, size, 12);
+          ctx.fill();
+        }
 
         // Draw Hand holding it
         ctx.fillStyle = "#fca5a5"; // Skin tone
