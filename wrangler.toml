@@ -1,0 +1,10 @@
+name = "lvrt-google-activity"
+compatibility_date = "2025-11-28"
+pages_build_output_dir = ".vercel/output/static"
+
+# For Next.js on Cloudflare Pages
+[build]
+command = "npm run build"
+
+[build.environment]
+NODE_VERSION = "20"
