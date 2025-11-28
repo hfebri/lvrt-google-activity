@@ -49,17 +49,6 @@ export default function Activity3Page() {
             <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
             Back to Home
           </Link>
-          
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-hover to-white">
-              Takjil Rush
-            </h1>
-            {gameState === "playing" && (
-              <p className="text-gray-400 text-lg">
-                Catch as many takjil as you can before sunset!
-              </p>
-            )}
-          </div>
         </div>
 
         <div className="flex justify-center">

@@ -164,21 +164,22 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       // Calculate aspect ratios to determine how to fill the screen
       const imageAspect = stallImage.current.width / stallImage.current.height;
       const canvasAspect = width / height;
+      const STALL_SCALE = 0.8;
 
       let drawWidth, drawHeight, drawX, drawY;
 
       if (canvasAspect > imageAspect) {
         // Canvas is wider, fit to width
-        drawWidth = width;
-        drawHeight = width / imageAspect;
-        drawX = 0;
+        drawWidth = width * STALL_SCALE;
+        drawHeight = (width / imageAspect) * STALL_SCALE;
+        drawX = (width - drawWidth) / 2; // Center horizontally
         drawY = (height - drawHeight) / 2;
       } else {
         // Canvas is taller, fit to height
-        drawHeight = height;
-        drawWidth = height * imageAspect;
+        drawHeight = height * STALL_SCALE;
+        drawWidth = height * imageAspect * STALL_SCALE;
         drawX = (width - drawWidth) / 2;
-        drawY = 0;
+        drawY = (height - drawHeight) / 2; // Center vertically
       }
 
       ctx.drawImage(stallImage.current, drawX, drawY, drawWidth, drawHeight);
