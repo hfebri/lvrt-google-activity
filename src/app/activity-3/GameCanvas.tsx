@@ -177,13 +177,13 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         drawWidth = width * STALL_SCALE;
         drawHeight = (width / imageAspect) * STALL_SCALE;
         drawX = (width - drawWidth) / 2; // Center horizontally
-        drawY = (height - drawHeight) / 2;
+        drawY = (height - drawHeight) / 2 + 30; // Move down 30 pixels
       } else {
         // Canvas is taller, fit to height
         drawHeight = height * STALL_SCALE;
         drawWidth = height * imageAspect * STALL_SCALE;
         drawX = (width - drawWidth) / 2;
-        drawY = (height - drawHeight) / 1.5; // Center vertically
+        drawY = (height - drawHeight) / 2 + 30; // Move down 30 pixels
       }
 
       ctx.drawImage(stallImage.current, drawX, drawY, drawWidth, drawHeight);
