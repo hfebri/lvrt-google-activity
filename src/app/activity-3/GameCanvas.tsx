@@ -104,6 +104,10 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
     return () => {
       window.removeEventListener("hand-results", handleHandResults);
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+      // Stop hand tracker when component unmounts
+      if (handTracker.current) {
+        handTracker.current.stop();
+      }
     };
   }, []);
 
@@ -164,7 +168,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       // Calculate aspect ratios to determine how to fill the screen
       const imageAspect = stallImage.current.width / stallImage.current.height;
       const canvasAspect = width / height;
-      const STALL_SCALE = 0.8;
+      const STALL_SCALE = 0.7;
 
       let drawWidth, drawHeight, drawX, drawY;
 
@@ -179,7 +183,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         drawHeight = height * STALL_SCALE;
         drawWidth = height * imageAspect * STALL_SCALE;
         drawX = (width - drawWidth) / 2;
-        drawY = (height - drawHeight) / 2; // Center vertically
+        drawY = (height - drawHeight) / 1.5; // Center vertically
       }
 
       ctx.drawImage(stallImage.current, drawX, drawY, drawWidth, drawHeight);
