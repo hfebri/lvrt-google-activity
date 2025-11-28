@@ -180,13 +180,19 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       if (availableSpots.length > 0) {
         const spotIndex = availableSpots[Math.floor(Math.random() * availableSpots.length)];
         const typeIndex = Math.floor(Math.random() * TAKJIL_TYPES.length);
-        
+
+        // NPC difficulty increases over time (starts slower, gets faster)
+        // Start: 4000ms (4 seconds - easy)
+        // End: 1500ms (1.5 seconds - very hard)
+        const gameProgress = Math.min(timeLeft / GAME_DURATION, 1); // 1 at start, 0 at end
+        const npcDuration = 4000 - (gameProgress * 2500); // 4000ms -> 1500ms
+
         takjils.current.push({
           id: Math.random(),
           type: TAKJIL_TYPES[typeIndex],
           positionIndex: spotIndex,
           spawnTime: timestamp,
-          duration: 2000, // Disappear after 2 seconds
+          duration: npcDuration,
           state: "idle",
         });
         lastSpawn.current = timestamp;
