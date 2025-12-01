@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Trophy, RotateCcw, Receipt } from "lucide-react";
@@ -31,18 +31,24 @@ function Activity3Content() {
   const [joinError, setJoinError] = useState<string>("");
   const [isJoining, setIsJoining] = useState(false);
 
+  // Generate player name once and store it
+  const playerNameRef = useRef(`Player ${Math.floor(Math.random() * 1000)}`);
+
+  // Memoize callbacks to prevent re-renders
+  const handleCountdownStart = useCallback(() => {
+    // Trigger countdown in GameCanvas for non-host players
+    // This will be called when the broadcast event is received
+  }, []);
+
+  const handleGameStart = useCallback(() => {
+    setAppState("playing");
+  }, []);
+
   const multiplayer = useMultiplayerSession({
     sessionCode: sessionCodeFromUrl || undefined,
-    playerName: `Player ${Math.floor(Math.random() * 1000)}`,
-    onCountdownStart: () => {
-      // Trigger countdown in GameCanvas for non-host players
-      if ((multiplayer as any).triggerCountdown) {
-        (multiplayer as any).triggerCountdown();
-      }
-    },
-    onGameStart: () => {
-      setAppState("playing");
-    },
+    playerName: playerNameRef.current,
+    onCountdownStart: handleCountdownStart,
+    onGameStart: handleGameStart,
   });
 
   // Auto-join session from URL

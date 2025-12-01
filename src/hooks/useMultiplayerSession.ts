@@ -59,6 +59,10 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     `player_${Math.random().toString(36).substring(2, 11)}`
   );
 
+  // Store options in ref to avoid recreating channel on every render
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
   // Generate random session code
   const generateSessionCode = useCallback(() => {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Avoid confusing chars
@@ -134,8 +138,8 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
       payload: {},
     });
 
-    options.onCountdownStart?.();
-  }, [state.isHost, state.sessionCode, options]);
+    optionsRef.current.onCountdownStart?.();
+  }, [state.isHost, state.sessionCode]);
 
   // Start game (host only) - called after countdown
   const startGame = useCallback(async () => {
@@ -153,8 +157,8 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     });
 
     setState((prev) => ({ ...prev, gameStatus: "playing" }));
-    options.onGameStart?.();
-  }, [state.isHost, state.sessionCode, options]);
+    optionsRef.current.onGameStart?.();
+  }, [state.isHost, state.sessionCode]);
 
   // Broadcast hand position
   const updateHandPosition = useCallback(
@@ -263,18 +267,18 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
           handPosition: null,
           color: PLAYER_COLORS[state.players.size % PLAYER_COLORS.length],
         };
-        options.onPlayerJoined?.(player);
+        optionsRef.current.onPlayerJoined?.(player);
       })
       .on("presence", { event: "leave" }, ({ key }) => {
-        options.onPlayerLeft?.(key);
+        optionsRef.current.onPlayerLeft?.(key);
       })
       // Broadcast events
       .on("broadcast", { event: "countdown_start" }, () => {
-        options.onCountdownStart?.();
+        optionsRef.current.onCountdownStart?.();
       })
       .on("broadcast", { event: "game_start" }, () => {
         setState((prev) => ({ ...prev, gameStatus: "playing" }));
-        options.onGameStart?.();
+        optionsRef.current.onGameStart?.();
       })
       .on("broadcast", { event: "hand_position" }, ({ payload }) => {
         setState((prev) => {
@@ -304,7 +308,7 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
           return { ...prev, players: newPlayers };
         });
 
-        options.onItemCollected?.(payload.itemId, payload.playerId);
+        optionsRef.current.onItemCollected?.(payload.itemId, payload.playerId);
       })
       .on("broadcast", { event: "item_spawn" }, ({ payload }) => {
         setState((prev) => ({
@@ -326,7 +330,7 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           await channel.track({
-            name: options.playerName || "Player",
+            name: optionsRef.current.playerName || "Player",
             score: 0,
             online_at: new Date().toISOString(),
           });
@@ -338,7 +342,7 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     return () => {
       channel.unsubscribe();
     };
-  }, [state.sessionCode, options]);
+  }, [state.sessionCode]);
 
   return {
     state,
