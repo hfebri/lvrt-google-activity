@@ -33,7 +33,7 @@ export default function JoinSession({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="items-center flex justify-center p-4">
       <div className="max-w-md w-full">
         {/* Back Button */}
         <button

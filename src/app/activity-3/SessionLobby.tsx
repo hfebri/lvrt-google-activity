@@ -22,7 +22,7 @@ export default function SessionLobby({
   const playerArray = Array.from(players.values());
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="items-center flex justify-center p-4">
       <div className="max-w-4xl w-full card p-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">

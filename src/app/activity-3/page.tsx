@@ -139,20 +139,8 @@ function Activity3Content() {
   };
 
   return (
-    <main className="min-h-screen py-12 px-4 relative overflow-hidden">
+    <main className="min-h-screen py-6 px-4 relative overflow-hidden">
       <div className="container relative z-10">
-        {appState !== "mode-selection" && (
-          <div className="mb-8">
-            <Link
-              href="/"
-              className="inline-flex items-center text-primary hover:text-primary-hover transition-colors mb-6 group"
-            >
-              <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
-              Back to Home
-            </Link>
-          </div>
-        )}
-
         <div className="flex justify-center">
           {appState === "mode-selection" && (
             <ModeSelection
@@ -291,10 +279,10 @@ function Activity3Content() {
 export default function Activity3Page() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-yellow-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-xl text-gray-600">Loading...</p>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-xl text-gray-400">Loading...</p>
         </div>
       </div>
     }>

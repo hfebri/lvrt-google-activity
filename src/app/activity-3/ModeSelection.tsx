@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
 interface ModeSelectionProps {
   onSelectSinglePlayer: () => void;
   onSelectMultiplayer: () => void;
@@ -10,9 +13,18 @@ export default function ModeSelection({
   onSelectMultiplayer,
 }: ModeSelectionProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="items-center flex justify-center p-4">
       <div className="max-w-2xl w-full">
-        <div className="text-center mb-12">
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center text-primary hover:text-primary-hover transition-colors mb-4 group"
+          >
+            <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
+            Back to Home
+          </Link>
+        </div>
+        <div className="text-center mb-8">
           <h1 className="text-5xl font-serif font-bold text-primary mb-4">
             Takjil War
           </h1>
@@ -25,12 +37,12 @@ export default function ModeSelection({
           {/* Single Player Mode */}
           <button
             onClick={onSelectSinglePlayer}
-            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-8 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
+            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
           >
             <div className="text-center">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                 <svg
-                  className="w-10 h-10 text-primary"
+                  className="w-8 h-8 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -55,12 +67,12 @@ export default function ModeSelection({
           {/* Multiplayer Mode */}
           <button
             onClick={onSelectMultiplayer}
-            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-8 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
+            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
           >
             <div className="text-center">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                 <svg
-                  className="w-10 h-10 text-primary"
+                  className="w-8 h-8 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -83,7 +95,7 @@ export default function ModeSelection({
           </button>
         </div>
 
-        <div className="mt-8 text-center text-sm text-primary/70">
+        <div className="mt-6 text-center text-sm text-primary/70">
           <p>Use hand gestures to collect takjil items!</p>
           <p className="mt-1">Pinch your thumb and index finger to grab items</p>
         </div>
