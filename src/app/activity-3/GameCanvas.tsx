@@ -27,6 +27,7 @@ interface GameCanvasProps {
     spawnItem: (item: any) => void;
     updateScore: (score: number) => void;
   };
+  countdownTriggerRef?: React.MutableRefObject<(() => void) | null>;
 }
 
 interface Takjil {
@@ -67,7 +68,7 @@ const SPAWN_POINTS = [
   { x: 0.72, y: 0.60 }, // Right plate
 ];
 
-export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSession }: GameCanvasProps) {
+export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSession, countdownTriggerRef }: GameCanvasProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
@@ -170,11 +171,10 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
 
   // Expose countdown function via ref for multiplayer
   useEffect(() => {
-    if (isMultiplayer && multiplayerSession) {
-      // Attach countdown handler to session object
-      (multiplayerSession as any).triggerCountdown = startCountdownSequence;
+    if (countdownTriggerRef) {
+      countdownTriggerRef.current = startCountdownSequence;
     }
-  }, [isMultiplayer, multiplayerSession, startCountdownSequence]);
+  }, [countdownTriggerRef, startCountdownSequence]);
 
   useEffect(() => {
     const initTracker = async () => {

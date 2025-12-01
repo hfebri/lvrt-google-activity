@@ -34,10 +34,15 @@ function Activity3Content() {
   // Generate player name once and store it
   const playerNameRef = useRef(`Player ${Math.floor(Math.random() * 1000)}`);
 
+  // Store reference to countdown trigger function
+  const countdownTriggerRef = useRef<(() => void) | null>(null);
+
   // Memoize callbacks to prevent re-renders
   const handleCountdownStart = useCallback(() => {
     // Trigger countdown in GameCanvas for non-host players
-    // This will be called when the broadcast event is received
+    if (countdownTriggerRef.current) {
+      countdownTriggerRef.current();
+    }
   }, []);
 
   const handleGameStart = useCallback(() => {
@@ -193,6 +198,7 @@ function Activity3Content() {
               onEnd={handleGameEnd}
               isMultiplayer={gameMode === "multiplayer"}
               multiplayerSession={gameMode === "multiplayer" ? multiplayer : undefined}
+              countdownTriggerRef={countdownTriggerRef}
             />
           )}
 
