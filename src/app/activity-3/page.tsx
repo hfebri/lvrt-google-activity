@@ -34,6 +34,12 @@ function Activity3Content() {
   const multiplayer = useMultiplayerSession({
     sessionCode: sessionCodeFromUrl || undefined,
     playerName: `Player ${Math.floor(Math.random() * 1000)}`,
+    onCountdownStart: () => {
+      // Trigger countdown in GameCanvas for non-host players
+      if ((multiplayer as any).triggerCountdown) {
+        (multiplayer as any).triggerCountdown();
+      }
+    },
     onGameStart: () => {
       setAppState("playing");
     },

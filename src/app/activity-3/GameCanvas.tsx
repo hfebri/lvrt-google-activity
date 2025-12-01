@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { HandTracker } from "./HandTracker";
 import { Play, Timer, Trophy } from "lucide-react";
@@ -18,8 +18,10 @@ interface GameCanvasProps {
     state: {
       players: Map<string, Player>;
       items: any[];
+      isHost: boolean;
     };
     playerId: string;
+    startCountdown: () => void;
     updateHandPosition: (x: number, y: number) => void;
     collectItem: (itemId: string, score: number) => void;
     spawnItem: (item: any) => void;
@@ -72,6 +74,9 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
   const [timeLeft, setTimeLeft] = useState(30);
   const [gameStarted, setGameStarted] = useState(false);
   const [calibrated, setCalibrated] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showStartButton, setShowStartButton] = useState(true);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handTracker = useRef<HandTracker | null>(null);
   const takjils = useRef<Takjil[]>([]);
@@ -84,6 +89,92 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
   const stallImage = useRef<HTMLImageElement | null>(null);
   const foodImages = useRef<Record<string, HTMLImageElement>>({});
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use ref for score to avoid stale closures in game loop
+  const scoreRef = useRef(0);
+
+  // Define countdown sequence function
+  const startCountdownSequence = useCallback(() => {
+    setShowStartButton(false);
+    setCountdown(3);
+
+    // Clear any existing countdown
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+
+    // Countdown: 3, 2, 1, then start
+    let count = 3;
+    countdownIntervalRef.current = setInterval(() => {
+      count--;
+      if (count > 0) {
+        setCountdown(count);
+      } else {
+        setCountdown(null);
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+        }
+        startGameActual();
+      }
+    }, 1000);
+  }, []);
+
+  const startGameActual = () => {
+    if (!webcamRef.current?.video || !handTracker.current) return;
+
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    setGameStarted(true);
+    setScore(0);
+    setTimeLeft(30);
+    takjils.current = [];
+    animations.current = [];
+    itemsCollectedRef.current = {};
+    TAKJIL_TYPES.forEach(type => itemsCollectedRef.current[type] = 0);
+
+    handTracker.current.start(webcamRef.current.video);
+    gameLoopRef.current = requestAnimationFrame(gameLoop);
+
+    // Timer
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          // Delay endGame to avoid state update during render
+          setTimeout(() => endGame(), 0);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleStartClick = () => {
+    setShowStartButton(false);
+
+    // Broadcast countdown start in multiplayer
+    if (isMultiplayer && multiplayerSession) {
+      multiplayerSession.startCountdown();
+    }
+
+    // Start countdown
+    startCountdownSequence();
+  };
+
+  // Expose countdown function via ref for multiplayer
+  useEffect(() => {
+    if (isMultiplayer && multiplayerSession) {
+      // Attach countdown handler to session object
+      (multiplayerSession as any).triggerCountdown = startCountdownSequence;
+    }
+  }, [isMultiplayer, multiplayerSession, startCountdownSequence]);
 
   useEffect(() => {
     const initTracker = async () => {
@@ -135,42 +226,6 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
     };
   }, []);
 
-  const startGame = () => {
-    if (!webcamRef.current?.video || !handTracker.current) return;
-
-    // Clear any existing timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
-    setGameStarted(true);
-    setScore(0);
-    setTimeLeft(30);
-    takjils.current = [];
-    animations.current = [];
-    itemsCollectedRef.current = {};
-    TAKJIL_TYPES.forEach(type => itemsCollectedRef.current[type] = 0);
-
-    handTracker.current.start(webcamRef.current.video);
-    gameLoopRef.current = requestAnimationFrame(gameLoop);
-
-    // Timer
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-          // Delay endGame to avoid state update during render
-          setTimeout(() => endGame(), 0);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
   const endGame = () => {
     // Clean up game loop
     if (gameLoopRef.current) {
@@ -194,9 +249,6 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       itemsCollected: itemsCollectedRef.current
     });
   };
-
-  // Use ref for score to avoid stale closures in game loop
-  const scoreRef = useRef(0);
 
   const gameLoop = (timestamp: number) => {
     if (!canvasRef.current) return;
@@ -622,17 +674,42 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       {!gameStarted && calibrated && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-30">
           <div className="text-center">
-            <h3 className="text-4xl font-serif text-white mb-6">Takjil War!</h3>
-            <button 
-              onClick={startGame} 
-              className="btn btn-primary mx-auto text-xl px-12 py-4 shadow-[0_0_30px_rgba(192,160,98,0.4)] hover:shadow-[0_0_50px_rgba(192,160,98,0.6)] hover:scale-105 transition-all"
-            >
-              <Play fill="currentColor" /> Start Game
-            </button>
-            <div className="mt-6 text-gray-300 text-lg space-y-2">
-              <p>Grab the takjil before others do!</p>
-              <p><span className="text-primary font-bold">Pinch</span> to collect. Don't let them steal it!</p>
-            </div>
+            {countdown !== null ? (
+              // Countdown Display
+              <div className="animate-in zoom-in duration-300">
+                <div className="text-9xl font-bold text-primary mb-4 drop-shadow-[0_0_30px_rgba(192,160,98,0.8)] animate-pulse">
+                  {countdown}
+                </div>
+                <p className="text-2xl text-white font-semibold">Get Ready!</p>
+              </div>
+            ) : (
+              // Start Screen
+              <>
+                <h3 className="text-4xl font-serif text-white mb-6">Takjil War!</h3>
+                {(!isMultiplayer || (multiplayerSession?.state.isHost)) && showStartButton && (
+                  <button
+                    onClick={handleStartClick}
+                    className="btn btn-primary mx-auto text-xl px-12 py-4 shadow-[0_0_30px_rgba(192,160,98,0.4)] hover:shadow-[0_0_50px_rgba(192,160,98,0.6)] hover:scale-105 transition-all"
+                  >
+                    <Play fill="currentColor" /> Start Game
+                  </button>
+                )}
+                {isMultiplayer && !multiplayerSession?.state.isHost && (
+                  <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                    <p className="text-xl text-gray-300">Waiting for host to start the game...</p>
+                    <div className="mt-4 flex justify-center">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-6 text-gray-300 text-lg space-y-2">
+                  <p>Grab the takjil before others do!</p>
+                  <p><span className="text-primary font-bold">Pinch</span> to collect. Don't let them steal it!</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -33,6 +33,7 @@ interface UseMultiplayerSessionOptions {
   onItemCollected?: (itemId: string, playerId: string) => void;
   onGameStart?: () => void;
   onGameEnd?: () => void;
+  onCountdownStart?: () => void;
 }
 
 const PLAYER_COLORS = [
@@ -123,7 +124,20 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     return true;
   }, []);
 
-  // Start game (host only)
+  // Start countdown (host only)
+  const startCountdown = useCallback(() => {
+    if (!state.isHost || !state.sessionCode) return;
+
+    channelRef.current?.send({
+      type: "broadcast",
+      event: "countdown_start",
+      payload: {},
+    });
+
+    options.onCountdownStart?.();
+  }, [state.isHost, state.sessionCode, options]);
+
+  // Start game (host only) - called after countdown
   const startGame = useCallback(async () => {
     if (!state.isHost || !state.sessionCode) return;
 
@@ -255,6 +269,9 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
         options.onPlayerLeft?.(key);
       })
       // Broadcast events
+      .on("broadcast", { event: "countdown_start" }, () => {
+        options.onCountdownStart?.();
+      })
       .on("broadcast", { event: "game_start" }, () => {
         setState((prev) => ({ ...prev, gameStatus: "playing" }));
         options.onGameStart?.();
@@ -328,6 +345,7 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     playerId: playerIdRef.current,
     createSession,
     joinSession,
+    startCountdown,
     startGame,
     updateHandPosition,
     collectItem,
