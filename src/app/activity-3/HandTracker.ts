@@ -38,12 +38,21 @@ export class HandTracker {
     if (!this.handLandmarker || !this.webcamRunning || !this.video) return;
 
     let startTimeMs = performance.now();
-    if (this.video.currentTime > 0) {
-      const results = this.handLandmarker.detectForVideo(this.video, startTimeMs);
-      // Dispatch event or callback with results
-      if (results.landmarks) {
-        const event = new CustomEvent("hand-results", { detail: results });
-        window.dispatchEvent(event);
+
+    // Check if video is still valid and has started playing
+    if (this.video && this.video.readyState >= 2 && this.video.currentTime > 0) {
+      try {
+        const results = this.handLandmarker.detectForVideo(this.video, startTimeMs);
+        // Dispatch event or callback with results
+        if (results.landmarks) {
+          const event = new CustomEvent("hand-results", { detail: results });
+          window.dispatchEvent(event);
+        }
+      } catch (error) {
+        // Silently handle errors (likely video was unmounted)
+        console.warn("Hand detection error:", error);
+        this.webcamRunning = false;
+        return;
       }
     }
 

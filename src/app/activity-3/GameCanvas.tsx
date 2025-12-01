@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { HandTracker } from "./HandTracker";
 import { Play, Timer, Trophy } from "lucide-react";
+import type { Player } from "@/hooks/useMultiplayerSession";
 
 interface GameStats {
   totalScore: number;
@@ -12,6 +13,18 @@ interface GameStats {
 
 interface GameCanvasProps {
   onEnd: (stats: GameStats) => void;
+  isMultiplayer?: boolean;
+  multiplayerSession?: {
+    state: {
+      players: Map<string, Player>;
+      items: any[];
+    };
+    playerId: string;
+    updateHandPosition: (x: number, y: number) => void;
+    collectItem: (itemId: string, score: number) => void;
+    spawnItem: (item: any) => void;
+    updateScore: (score: number) => void;
+  };
 }
 
 interface Takjil {
@@ -46,13 +59,13 @@ const TAKJIL_SIZE = 150; // Size of gorengan/takjil items in pixels
 // Define 4 spawn points matching the plates on stall.png (full screen)
 // Plates are positioned lower to sit on the actual plates
 const SPAWN_POINTS = [
-  { x: 0.25, y: 0.60 }, // Left plate
+  { x: 0.28, y: 0.60 }, // Left plate
   { x: 0.42, y: 0.60 }, // Center-left plate
-  { x: 0.58, y: 0.60 }, // Center-right plate
-  { x: 0.75, y: 0.60 }, // Right plate
+  { x: 0.56, y: 0.60 }, // Center-right plate
+  { x: 0.72, y: 0.60 }, // Right plate
 ];
 
-export default function GameCanvas({ onEnd }: GameCanvasProps) {
+export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSession }: GameCanvasProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
@@ -70,6 +83,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
   const isPinchingRef = useRef(false);
   const stallImage = useRef<HTMLImageElement | null>(null);
   const foodImages = useRef<Record<string, HTMLImageElement>>({});
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const initTracker = async () => {
@@ -103,7 +117,17 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
 
     return () => {
       window.removeEventListener("hand-results", handleHandResults);
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+
+      // Clean up game loop
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
+
+      // Clean up timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+
       // Stop hand tracker when component unmounts
       if (handTracker.current) {
         handTracker.current.stop();
@@ -113,7 +137,12 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
 
   const startGame = () => {
     if (!webcamRef.current?.video || !handTracker.current) return;
-    
+
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
     setGameStarted(true);
     setScore(0);
     setTimeLeft(30);
@@ -121,15 +150,18 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
     animations.current = [];
     itemsCollectedRef.current = {};
     TAKJIL_TYPES.forEach(type => itemsCollectedRef.current[type] = 0);
-    
+
     handTracker.current.start(webcamRef.current.video);
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-    
+
     // Timer
-    const timer = setInterval(() => {
+    timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
           // Delay endGame to avoid state update during render
           setTimeout(() => endGame(), 0);
           return 0;
@@ -140,8 +172,23 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
   };
 
   const endGame = () => {
-    if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-    handTracker.current?.stop();
+    // Clean up game loop
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+      gameLoopRef.current = 0;
+    }
+
+    // Clean up timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Stop hand tracking
+    if (handTracker.current) {
+      handTracker.current.stop();
+    }
+
     onEnd({
       totalScore: scoreRef.current,
       itemsCollected: itemsCollectedRef.current
@@ -293,7 +340,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       for (const landmarks of handResults.current.landmarks) {
         const thumbTip = landmarks[4];
         const indexTip = landmarks[8];
-        
+
         // Mirror X coordinates
         const thumbX = (1 - thumbTip.x) * width;
         const thumbY = thumbTip.y * height;
@@ -306,7 +353,12 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
         const cursorX = (thumbX + indexX) / 2;
         const cursorY = (thumbY + indexY) / 2;
 
-        // Draw Hand Cursor
+        // Broadcast hand position in multiplayer
+        if (isMultiplayer && multiplayerSession) {
+          multiplayerSession.updateHandPosition(cursorX / width, cursorY / height);
+        }
+
+        // Draw Hand Cursor (current player)
         ctx.beginPath();
         ctx.arc(cursorX, cursorY, 15, 0, 2 * Math.PI);
         ctx.fillStyle = isPinching ? "#0ea5e9" : "rgba(192, 160, 98, 0.8)";
@@ -335,19 +387,25 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
             const size = TAKJIL_SIZE;
 
             if (
-              cursorX > tx - size/2 && 
-              cursorX < tx + size/2 && 
-              cursorY > ty - size/2 && 
+              cursorX > tx - size/2 &&
+              cursorX < tx + size/2 &&
+              cursorY > ty - size/2 &&
               cursorY < ty + size/2
             ) {
               // Pick up!
               t.state = "collected";
               scoreRef.current += PRICE_PER_ITEM;
               setScore(scoreRef.current);
-              
+
               // Track Item
               itemsCollectedRef.current[t.type] = (itemsCollectedRef.current[t.type] || 0) + 1;
-              
+
+              // Broadcast collection in multiplayer
+              if (isMultiplayer && multiplayerSession) {
+                multiplayerSession.collectItem(String(t.id), scoreRef.current);
+                multiplayerSession.updateScore(scoreRef.current);
+              }
+
               // Trigger Collect Animation (Sparkle)
               animations.current.push({
                 id: Math.random(),
@@ -451,6 +509,35 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
       }
     });
 
+    // --- Draw Other Players' Cursors (Multiplayer) ---
+    if (isMultiplayer && multiplayerSession) {
+      multiplayerSession.state.players.forEach((player) => {
+        if (player.id === multiplayerSession.playerId) return; // Skip current player
+        if (!player.handPosition) return;
+
+        const px = player.handPosition.x * width;
+        const py = player.handPosition.y * height;
+
+        // Draw other player's cursor
+        ctx.beginPath();
+        ctx.arc(px, py, 12, 0, 2 * Math.PI);
+        ctx.fillStyle = player.color;
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw player name
+        ctx.fillStyle = "white";
+        ctx.font = "bold 12px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3;
+        ctx.strokeText(player.name, px, py - 20);
+        ctx.fillText(player.name, px, py - 20);
+      });
+    }
+
     gameLoopRef.current = requestAnimationFrame(gameLoop);
   };
 
@@ -480,7 +567,7 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
               <p className="text-2xl font-bold text-white font-mono">Rp {score.toLocaleString()}</p>
             </div>
           </div>
-          
+
           <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg flex items-center gap-3">
             <div className={`p-2 rounded-full ${timeLeft <= 5 ? 'bg-red-500/20 animate-pulse' : 'bg-blue-500/20'}`}>
               <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-400'}`} size={24} />
@@ -488,6 +575,45 @@ export default function GameCanvas({ onEnd }: GameCanvasProps) {
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Time</p>
               <p className={`text-2xl font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-white'}`}>{timeLeft}s</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Multiplayer Scoreboard */}
+      {gameStarted && isMultiplayer && multiplayerSession && multiplayerSession.state.players.size > 0 && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-lg min-w-[200px]">
+            <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2 text-center">
+              Players
+            </p>
+            <div className="space-y-1">
+              {Array.from(multiplayerSession.state.players.values())
+                .sort((a, b) => b.score - a.score)
+                .map((player, index) => (
+                  <div
+                    key={player.id}
+                    className={`flex items-center justify-between gap-3 px-2 py-1 rounded ${
+                      player.id === multiplayerSession.playerId
+                        ? 'bg-primary/20'
+                        : 'bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: player.color }}
+                      />
+                      <span className="text-sm text-white font-medium">
+                        {player.name}
+                        {player.id === multiplayerSession.playerId && ' (You)'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-mono text-primary font-bold">
+                      Rp {player.score.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

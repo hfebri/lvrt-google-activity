@@ -1,0 +1,128 @@
+"use client";
+
+import { QRCodeSVG } from "qrcode.react";
+import type { Player } from "@/hooks/useMultiplayerSession";
+
+interface SessionLobbyProps {
+  sessionCode: string;
+  players: Map<string, Player>;
+  isHost: boolean;
+  onStartGame: () => void;
+  onCancel: () => void;
+}
+
+export default function SessionLobby({
+  sessionCode,
+  players,
+  isHost,
+  onStartGame,
+  onCancel,
+}: SessionLobbyProps) {
+  const sessionUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/activity-3?session=${sessionCode}`;
+  const playerArray = Array.from(players.values());
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full card p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-serif font-bold text-primary mb-2">
+            Game Lobby
+          </h1>
+          <p className="text-gray-400">
+            {isHost ? "Share this code with your friends!" : "Waiting for host to start..."}
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          {/* Session Code & QR Code */}
+          <div className="text-center">
+            <div className="bg-surface/50 border border-white/10 rounded-xl p-6 mb-4">
+              <p className="text-sm text-gray-400 mb-2">Session Code</p>
+              <p className="text-5xl font-bold text-primary tracking-wider font-mono">
+                {sessionCode}
+              </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl inline-block shadow-lg">
+              <QRCodeSVG value={sessionUrl} size={200} level="H" />
+            </div>
+
+            <p className="text-xs text-gray-500 mt-4">
+              Scan QR code or enter code manually
+            </p>
+          </div>
+
+          {/* Players List */}
+          <div>
+            <h2 className="text-xl font-serif font-bold text-foreground mb-4">
+              Players ({playerArray.length})
+            </h2>
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+              {playerArray.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 border border-dashed border-white/10 rounded-lg">
+                  <p>Waiting for players to join...</p>
+                </div>
+              ) : (
+                playerArray.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center gap-3 bg-surface/30 rounded-lg p-3 border border-white/5"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm"
+                      style={{ backgroundColor: player.color }}
+                    >
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground">
+                        {player.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {player.id === players.keys().next().value && isHost
+                          ? "Host"
+                          : "Player"}
+                      </p>
+                    </div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={onCancel}
+            className="btn btn-outline"
+          >
+            Cancel
+          </button>
+
+          {isHost && (
+            <button
+              onClick={onStartGame}
+              disabled={playerArray.length < 1}
+              className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+            >
+              Start Game
+            </button>
+          )}
+        </div>
+
+        {/* Instructions */}
+        <div className="mt-8 bg-surface/30 border border-white/5 rounded-lg p-4">
+          <h3 className="font-serif font-semibold text-primary mb-2">Takjil War Rules:</h3>
+          <ul className="text-sm text-gray-400 space-y-1">
+            <li>• Battle for the best Takjil! Use your hands to snatch treats.</li>
+            <li>• Pinch your thumb and index finger to grab items before they're gone.</li>
+            <li>• Be faster than your friends, only the quickest hands eat first!</li>
+            <li>• Collect the most points to become the Takjil Champion!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

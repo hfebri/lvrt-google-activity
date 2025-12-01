@@ -1,38 +1,129 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Trophy, RotateCcw, Receipt } from "lucide-react";
 import GameCanvas from "./GameCanvas";
+import ModeSelection from "./ModeSelection";
+import HostOrJoin from "./HostOrJoin";
+import JoinSession from "./JoinSession";
+import SessionLobby from "./SessionLobby";
 import { supabase } from "@/lib/supabase";
+import { useMultiplayerSession } from "@/hooks/useMultiplayerSession";
 
 interface GameStats {
   totalScore: number;
   itemsCollected: Record<string, number>;
 }
 
-export default function Activity3Page() {
-  const [gameState, setGameState] = useState<"playing" | "ended">("playing");
+type AppState = "mode-selection" | "host-or-join" | "join-session" | "lobby" | "playing" | "ended";
+
+function Activity3Content() {
+  const searchParams = useSearchParams();
+  const sessionCodeFromUrl = searchParams.get("session");
+
+  const [appState, setAppState] = useState<AppState>("mode-selection");
+  const [gameMode, setGameMode] = useState<"single" | "multiplayer">("single");
   const [score, setScore] = useState(0);
   const [itemsCollected, setItemsCollected] = useState<Record<string, number>>({});
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [joinError, setJoinError] = useState<string>("");
+  const [isJoining, setIsJoining] = useState(false);
+
+  const multiplayer = useMultiplayerSession({
+    sessionCode: sessionCodeFromUrl || undefined,
+    playerName: `Player ${Math.floor(Math.random() * 1000)}`,
+    onGameStart: () => {
+      setAppState("playing");
+    },
+  });
+
+  // Auto-join session from URL
+  useEffect(() => {
+    if (sessionCodeFromUrl) {
+      setGameMode("multiplayer");
+      setIsJoining(true);
+      multiplayer.joinSession(sessionCodeFromUrl).then((success) => {
+        setIsJoining(false);
+        if (success) {
+          setAppState("lobby");
+        } else {
+          setJoinError("Session not found or has already started");
+          setAppState("join-session");
+        }
+      });
+    }
+  }, [sessionCodeFromUrl]);
+
+  const handleSelectSinglePlayer = () => {
+    setGameMode("single");
+    setAppState("playing");
+  };
+
+  const handleSelectMultiplayer = () => {
+    setGameMode("multiplayer");
+    setAppState("host-or-join");
+  };
+
+  const handleSelectHost = async () => {
+    const code = await multiplayer.createSession();
+    if (code) {
+      setAppState("lobby");
+    }
+  };
+
+  const handleSelectJoin = () => {
+    setJoinError("");
+    setAppState("join-session");
+  };
+
+  const handleJoinWithCode = async (code: string) => {
+    setIsJoining(true);
+    setJoinError("");
+    const success = await multiplayer.joinSession(code);
+    setIsJoining(false);
+
+    if (success) {
+      setAppState("lobby");
+    } else {
+      setJoinError("Session not found or has already started. Please check the code and try again.");
+    }
+  };
+
+  const handleBackToHostOrJoin = () => {
+    setJoinError("");
+    setAppState("host-or-join");
+  };
+
+  const handleBackToModeSelection = () => {
+    setAppState("mode-selection");
+  };
+
+  const handleStartGame = () => {
+    multiplayer.startGame();
+  };
+
+  const handleCancelLobby = () => {
+    setAppState("host-or-join");
+  };
 
   const handleGameEnd = async (stats: GameStats) => {
     setScore(stats.totalScore);
     setItemsCollected(stats.itemsCollected);
-    setGameState("ended");
-    
+    setAppState("ended");
+
     try {
       // Save score
       await supabase.from("scores").insert({ score: stats.totalScore });
-      
+
       // Fetch leaderboard
       const { data } = await supabase
         .from("scores")
         .select("*")
         .order("score", { ascending: false })
         .limit(5);
-        
+
       if (data) {
         setLeaderboard(data);
       }
@@ -41,20 +132,71 @@ export default function Activity3Page() {
     }
   };
 
+  const handlePlayAgain = () => {
+    setScore(0);
+    setItemsCollected({});
+    setAppState("mode-selection");
+  };
+
   return (
     <main className="min-h-screen py-12 px-4 relative overflow-hidden">
       <div className="container relative z-10">
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-primary hover:text-primary-hover transition-colors mb-6 group">
-            <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
-            Back to Home
-          </Link>
-        </div>
+        {appState !== "mode-selection" && (
+          <div className="mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center text-primary hover:text-primary-hover transition-colors mb-6 group"
+            >
+              <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
+              Back to Home
+            </Link>
+          </div>
+        )}
 
         <div className="flex justify-center">
-          {gameState === "playing" ? (
-            <GameCanvas onEnd={handleGameEnd} />
-          ) : (
+          {appState === "mode-selection" && (
+            <ModeSelection
+              onSelectSinglePlayer={handleSelectSinglePlayer}
+              onSelectMultiplayer={handleSelectMultiplayer}
+            />
+          )}
+
+          {appState === "host-or-join" && (
+            <HostOrJoin
+              onSelectHost={handleSelectHost}
+              onSelectJoin={handleSelectJoin}
+              onBack={handleBackToModeSelection}
+            />
+          )}
+
+          {appState === "join-session" && (
+            <JoinSession
+              onJoin={handleJoinWithCode}
+              onBack={handleBackToHostOrJoin}
+              isJoining={isJoining}
+              error={joinError}
+            />
+          )}
+
+          {appState === "lobby" && (
+            <SessionLobby
+              sessionCode={multiplayer.state.sessionCode}
+              players={multiplayer.state.players}
+              isHost={multiplayer.state.isHost}
+              onStartGame={handleStartGame}
+              onCancel={handleCancelLobby}
+            />
+          )}
+
+          {appState === "playing" && (
+            <GameCanvas
+              onEnd={handleGameEnd}
+              isMultiplayer={gameMode === "multiplayer"}
+              multiplayerSession={gameMode === "multiplayer" ? multiplayer : undefined}
+            />
+          )}
+
+          {appState === "ended" && (
             <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
               <div className="glass-panel p-8 text-center mb-8 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-primary to-transparent" />
@@ -94,8 +236,8 @@ export default function Activity3Page() {
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => setGameState("playing")} 
+                <button
+                  onClick={handlePlayAgain}
                   className="btn btn-primary w-full"
                 >
                   <RotateCcw size={20} /> Play Again
@@ -143,5 +285,20 @@ export default function Activity3Page() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Activity3Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-yellow-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-xl text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <Activity3Content />
+    </Suspense>
   );
 }
