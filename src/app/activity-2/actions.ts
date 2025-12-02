@@ -67,10 +67,11 @@ export async function generatePoster(industry: string, imageBase64: string) {
     const { generateImageWithPhoto } = await import("@/lib/gemini");
     const { uploadImageToStorage } = await import("@/lib/storage");
 
-    // Create detailed prompt for the poster
-    const imagePrompt = `Create a professional advertisement poster for ${brandName}.
+    // Create detailed prompt for the poster WITH embedded text
+    const imagePrompt = `Create a professional advertisement poster for a Ramadan/Eid campaign.
 
-    Tagline: "${tagline}"
+    BRAND NAME: "${brandName}"
+    TAGLINE: "${tagline}"
     Concept: ${concept}
     Industry: ${industry}
     Theme: Ramadan/Eid celebration
@@ -86,11 +87,16 @@ export async function generatePoster(industry: string, imageBase64: string) {
     - Only enhance the background, setting, and surrounding elements
     - Keep their natural appearance - do not alter their identity
 
-    TEXT REQUIREMENTS:
-    - DO NOT add any text, taglines, or words to the image
-    - NO text overlay at the bottom or anywhere on the poster
-    - The image should be purely visual with decorative elements only
-    - Text will be added separately later
+    TEXT REQUIREMENTS - VERY IMPORTANT:
+    - MUST include the brand name "${brandName}" prominently in the poster
+    - MUST include the tagline "${tagline}" below or near the brand name
+    - Place the text at the BOTTOM THIRD of the poster in an elegant panel/overlay
+    - Use modern, professional typography (sans-serif for brand, elegant serif for tagline)
+    - Text should be clearly readable with good contrast
+    - Add a semi-transparent gradient overlay behind the text for readability
+    - Text color should be white/gold to match Ramadan theme
+    - The brand name should be LARGER and BOLDER than the tagline
+    - Center-align the text for professional look
 
     Visual requirements:
     - Feature the ONE person from the provided photo prominently as the sole brand ambassador
@@ -100,10 +106,12 @@ export async function generatePoster(industry: string, imageBase64: string) {
     - Warm, festive color palette (gold, green, deep blue)
     - Industry-appropriate setting and mood for ${industry}
     - High quality, magazine-worthy advertisement
-    - The person should look professional and engaging with proper lighting
-    - Add subtle brand elements and Ramadan decorative patterns (geometric shapes, lanterns, crescents)
+    - The person should be in the UPPER 2/3 of the poster
+    - Bottom 1/3 reserved for brand name and tagline text overlay
     - Professional studio lighting and composition
-    - Focus should be on the ONE person from the input photo`;
+    - Add subtle Ramadan decorative patterns (geometric shapes, lanterns, crescents)
+    - Portrait orientation (9:16 aspect ratio)
+    - Focus should be on the ONE person from the input photo with the brand text clearly visible at bottom`;
 
     console.log('⚡ Using Gemini 2.5 Flash Image (MUCH FASTER than 3 Pro!)...');
     console.log(`📝 Prompt: ${imagePrompt.substring(0, 100)}...`);

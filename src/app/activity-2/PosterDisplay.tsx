@@ -38,22 +38,16 @@ export default function PosterDisplay({ posterUrl, brandName, tagline }: PosterD
       <div className="w-full max-w-[400px] mx-auto lg:mx-0 relative group">
         <div className="absolute -inset-4 bg-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
-        <div 
+        <div
           ref={posterRef}
           className="relative aspect-[9/16] w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10 group-hover:scale-[1.02] transition-transform duration-500"
         >
-          <img 
-            src={posterUrl} 
-            alt="Generated Poster" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            crossOrigin="anonymous" 
+          <img
+            src={posterUrl}
+            alt="Generated Poster"
+            className="absolute inset-0 w-full h-full object-cover"
+            crossOrigin="anonymous"
           />
-          
-          {/* Overlay for Brand Info - rendered on the image */}
-          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-8 pt-24 text-center">
-            <h2 className="text-3xl font-serif font-bold text-primary mb-2 drop-shadow-lg">{brandName}</h2>
-            <p className="text-white font-medium tracking-wide drop-shadow-md">{tagline}</p>
-          </div>
         </div>
       </div>
 
