@@ -57,7 +57,22 @@ const TAKJIL_TYPES = ["Tahu", "Tempe", "Bakwan", "Singkong", "Risol"];
 const COLORS = ["#FF5722", "#FFC107", "#8BC34A", "#795548", "#FF9800"];
 const PRICE_PER_ITEM = 1000;
 const GAME_DURATION = 30; // Game duration in seconds
-const TAKJIL_SIZE = 150; // Size of gorengan/takjil items in pixels
+
+// Helper function to get size based on screen width
+const getTakjilSize = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < 768 ? 80 : 150; // Smaller on mobile
+  }
+  return 150;
+};
+
+// Helper function to get stall scale based on screen width
+const getStallScale = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < 768 ? 0.45 : 0.7; // Much smaller on mobile
+  }
+  return 0.7;
+};
 
 // Define 4 spawn points matching the plates on stall.png (full screen)
 // Plates are positioned lower to sit on the actual plates
@@ -267,7 +282,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       // Calculate aspect ratios to determine how to fill the screen
       const imageAspect = stallImage.current.width / stallImage.current.height;
       const canvasAspect = width / height;
-      const STALL_SCALE = 0.7;
+      const STALL_SCALE = getStallScale(); // Use dynamic scale based on screen size
 
       let drawWidth, drawHeight, drawX, drawY;
 
@@ -327,7 +342,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       const spot = SPAWN_POINTS[t.positionIndex];
       const x = spot.x * width;
       const y = spot.y * height;
-      const size = TAKJIL_SIZE;
+      const size = getTakjilSize();
 
       // Check expiry (Stolen Logic)
       if (timestamp - t.spawnTime > t.duration) {
@@ -436,7 +451,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
             const spot = SPAWN_POINTS[t.positionIndex];
             const tx = spot.x * width;
             const ty = spot.y * height;
-            const size = TAKJIL_SIZE;
+            const size = getTakjilSize();
 
             if (
               cursorX > tx - size/2 &&
@@ -494,7 +509,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
         const currentY = (anim.startY || 0) + ((anim.endY || 0) - (anim.startY || 0)) * ease;
 
         // Draw Item being stolen with pixel art
-        const size = TAKJIL_SIZE;
+        const size = getTakjilSize();
         const foodImg = foodImages.current[anim.takjilType || ""];
 
         if (foodImg) {
@@ -594,7 +609,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
   };
 
   return (
-    <div className="relative w-full mx-auto bg-black rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/10 group animate-in fade-in zoom-in duration-500" style={{ height: 'min(80vh, 600px)', maxWidth: '1200px' }}>
+    <div className="relative w-full mx-auto bg-black rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/10 group animate-in fade-in zoom-in duration-500 flex items-center justify-center" style={{ height: 'min(80vh, 600px)', maxWidth: '1200px' }}>
       <Webcam
         ref={webcamRef}
         className="absolute inset-0 w-full h-full object-cover mirrored"
@@ -696,7 +711,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
                 )}
                 {isMultiplayer && !multiplayerSession?.state.isHost && (
                   <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-white/10">
-                    <p className="text-base sm:text-xl text-gray-300">Waiting for host to start the game...</p>
+                    <p className="text-base sm:text-xl text-slate-900">Waiting for host to start the game...</p>
                     <div className="mt-4 flex justify-center">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '150ms' }}></div>
