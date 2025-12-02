@@ -138,6 +138,13 @@ function Activity3Content() {
     setAppState("host-or-join");
   };
 
+  const handleUpdatePlayerName = (newName: string) => {
+    playerNameRef.current = newName;
+    setPlayerName(newName);
+    // Update the name in the multiplayer session
+    multiplayer.updatePlayerName(newName);
+  };
+
   const handleGameEnd = async (stats: GameStats) => {
     setScore(stats.totalScore);
     setItemsCollected(stats.itemsCollected);
@@ -201,8 +208,10 @@ function Activity3Content() {
               sessionCode={multiplayer.state.sessionCode}
               players={multiplayer.state.players}
               isHost={multiplayer.state.isHost}
+              currentPlayerName={playerName}
               onStartGame={handleStartGame}
               onCancel={handleCancelLobby}
+              onUpdatePlayerName={handleUpdatePlayerName}
             />
           )}
 

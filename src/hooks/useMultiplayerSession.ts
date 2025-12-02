@@ -208,6 +208,32 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     [state.isHost]
   );
 
+  // Update player name
+  const updatePlayerName = useCallback((newName: string) => {
+    setState((prev) => {
+      const newPlayers = new Map(prev.players);
+      const player = newPlayers.get(playerIdRef.current);
+      if (player) {
+        player.name = newName;
+
+        // Broadcast name update to other players
+        if (channelRef.current) {
+          channelRef.current.send({
+            type: "broadcast",
+            event: "player-name-update",
+            payload: {
+              playerId: playerIdRef.current,
+              name: newName,
+            },
+          });
+        }
+
+        return { ...prev, players: newPlayers };
+      }
+      return prev;
+    });
+  }, []);
+
   // Update player score
   const updateScore = useCallback((score: number) => {
     setState((prev) => {
@@ -327,6 +353,17 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
           return { ...prev, players: newPlayers };
         });
       })
+      .on("broadcast", { event: "player-name-update" }, ({ payload }) => {
+        setState((prev) => {
+          const newPlayers = new Map(prev.players);
+          const player = newPlayers.get(payload.playerId);
+          if (player) {
+            player.name = payload.name;
+            newPlayers.set(payload.playerId, player);
+          }
+          return { ...prev, players: newPlayers };
+        });
+      })
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           await channel.track({
@@ -355,5 +392,6 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
     collectItem,
     spawnItem,
     updateScore,
+    updatePlayerName,
   };
 }

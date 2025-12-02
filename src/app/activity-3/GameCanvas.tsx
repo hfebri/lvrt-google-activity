@@ -624,24 +624,48 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       />
       
       {gameStarted && (
-        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex justify-between items-start z-20 gap-2">
-          <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-4 border border-slate-200 shadow-lg flex items-center gap-2 sm:gap-3">
-            <div className="bg-primary/20 p-1 sm:p-2 rounded-full">
-              <Trophy className="text-primary" size={20} />
+        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-20">
+          {/* Mobile: Horizontal compact layout */}
+          <div className="flex sm:hidden justify-between items-center gap-2 bg-white/95 backdrop-blur-md rounded-lg p-2 border border-slate-200 shadow-lg">
+            <div className="flex items-center gap-2 flex-1">
+              <Trophy className="text-primary" size={16} />
+              <div className="flex flex-col leading-tight">
+                <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Bill</p>
+                <p className="text-sm font-bold text-slate-900 font-mono">Rp {score.toLocaleString()}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-semibold">Bill</p>
-              <p className="text-base sm:text-2xl font-bold text-slate-900 font-mono">Rp {score.toLocaleString()}</p>
+
+            <div className="w-px h-8 bg-slate-200"></div>
+
+            <div className="flex items-center gap-2 flex-1 justify-end">
+              <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`} size={16} />
+              <div className="flex flex-col leading-tight text-right">
+                <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Time</p>
+                <p className={`text-sm font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-slate-900'}`}>{timeLeft}s</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-4 border border-slate-200 shadow-lg flex items-center gap-2 sm:gap-3">
-            <div className={`p-1 sm:p-2 rounded-full ${timeLeft <= 5 ? 'bg-red-500/20 animate-pulse' : 'bg-blue-500/20'}`}>
-              <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`} size={20} />
+          {/* Desktop: Original layout */}
+          <div className="hidden sm:flex justify-between items-start gap-2">
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-slate-200 shadow-lg flex items-center gap-3">
+              <div className="bg-primary/20 p-2 rounded-full">
+                <Trophy className="text-primary" size={20} />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Bill</p>
+                <p className="text-2xl font-bold text-slate-900 font-mono">Rp {score.toLocaleString()}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-semibold">Time</p>
-              <p className={`text-base sm:text-2xl font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-slate-900'}`}>{timeLeft}s</p>
+
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-slate-200 shadow-lg flex items-center gap-3">
+              <div className={`p-2 rounded-full ${timeLeft <= 5 ? 'bg-red-500/20 animate-pulse' : 'bg-blue-500/20'}`}>
+                <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`} size={20} />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Time</p>
+                <p className={`text-2xl font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-slate-900'}`}>{timeLeft}s</p>
+              </div>
             </div>
           </div>
         </div>
@@ -649,41 +673,81 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
 
       {/* Multiplayer Scoreboard */}
       {gameStarted && isMultiplayer && multiplayerSession && multiplayerSession.state.players.size > 0 && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-lg min-w-[200px]">
-            <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2 text-center">
-              Players
-            </p>
-            <div className="space-y-1">
-              {Array.from(multiplayerSession.state.players.values())
-                .sort((a, b) => b.score - a.score)
-                .map((player, index) => (
-                  <div
-                    key={player.id}
-                    className={`flex items-center justify-between gap-3 px-2 py-1 rounded ${
-                      player.id === multiplayerSession.playerId
-                        ? 'bg-primary/20'
-                        : 'bg-white/5'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: player.color }}
-                      />
-                      <span className="text-sm text-white font-medium">
-                        {player.name}
-                        {player.id === multiplayerSession.playerId && ' (You)'}
+        <>
+          {/* Mobile: Bottom compact layout */}
+          <div className="absolute sm:hidden bottom-2 left-2 right-2 z-20">
+            <div className="bg-white/95 backdrop-blur-md rounded-lg p-2 border border-slate-200 shadow-lg">
+              <p className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold mb-1 text-center">
+                Players
+              </p>
+              <div className="space-y-1">
+                {Array.from(multiplayerSession.state.players.values())
+                  .sort((a, b) => b.score - a.score)
+                  .map((player, index) => (
+                    <div
+                      key={player.id}
+                      className={`flex items-center justify-between gap-2 px-2 py-1 rounded ${
+                        player.id === multiplayerSession.playerId
+                          ? 'bg-primary/20'
+                          : 'bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: player.color }}
+                        />
+                        <span className="text-xs text-slate-900 font-medium truncate max-w-[100px]">
+                          {player.name}
+                          {player.id === multiplayerSession.playerId && ' (You)'}
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-primary font-bold">
+                        Rp {player.score.toLocaleString()}
                       </span>
                     </div>
-                    <span className="text-sm font-mono text-primary font-bold">
-                      Rp {player.score.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Desktop: Top center layout */}
+          <div className="hidden sm:block absolute top-20 left-1/2 transform -translate-x-1/2 z-20">
+            <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-lg min-w-[200px]">
+              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-2 text-center">
+                Players
+              </p>
+              <div className="space-y-1">
+                {Array.from(multiplayerSession.state.players.values())
+                  .sort((a, b) => b.score - a.score)
+                  .map((player, index) => (
+                    <div
+                      key={player.id}
+                      className={`flex items-center justify-between gap-3 px-2 py-1 rounded ${
+                        player.id === multiplayerSession.playerId
+                          ? 'bg-primary/20'
+                          : 'bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: player.color }}
+                        />
+                        <span className="text-sm text-white font-medium">
+                          {player.name}
+                          {player.id === multiplayerSession.playerId && ' (You)'}
+                        </span>
+                      </div>
+                      <span className="text-sm font-mono text-primary font-bold">
+                        Rp {player.score.toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       {!gameStarted && calibrated && (

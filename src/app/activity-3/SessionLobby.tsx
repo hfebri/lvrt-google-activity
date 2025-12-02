@@ -1,25 +1,42 @@
 "use client";
 
+import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { User } from "lucide-react";
 import type { Player } from "@/hooks/useMultiplayerSession";
 
 interface SessionLobbyProps {
   sessionCode: string;
   players: Map<string, Player>;
   isHost: boolean;
+  currentPlayerName: string;
   onStartGame: () => void;
   onCancel: () => void;
+  onUpdatePlayerName: (name: string) => void;
 }
 
 export default function SessionLobby({
   sessionCode,
   players,
   isHost,
+  currentPlayerName,
   onStartGame,
   onCancel,
+  onUpdatePlayerName,
 }: SessionLobbyProps) {
+  const [nameInput, setNameInput] = useState(currentPlayerName);
+  const [isEditingName, setIsEditingName] = useState(false);
+
   const sessionUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/activity-3?session=${sessionCode}`;
   const playerArray = Array.from(players.values());
+
+  const handleNameSubmit = () => {
+    const trimmedName = nameInput.trim();
+    if (trimmedName && trimmedName !== currentPlayerName) {
+      onUpdatePlayerName(trimmedName);
+    }
+    setIsEditingName(false);
+  };
 
   return (
     <div className="items-center flex justify-center p-4">
@@ -28,9 +45,54 @@ export default function SessionLobby({
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">
             Game Lobby
           </h1>
-          <p className="text-slate-700">
+          <p className="text-slate-700 mb-4">
             {isHost ? "Share this code with your friends!" : "Waiting for host to start..."}
           </p>
+
+          {/* Player Name Input */}
+          <div className="max-w-md mx-auto mt-6">
+            {!isEditingName ? (
+              <div className="flex items-center justify-center gap-3 bg-surface/30 border border-slate-200 rounded-lg p-3">
+                <User size={20} className="text-primary" />
+                <span className="font-semibold text-foreground">{currentPlayerName}</span>
+                <button
+                  onClick={() => setIsEditingName(true)}
+                  className="text-xs text-primary hover:text-primary-hover underline ml-2"
+                >
+                  Change Name
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
+                  placeholder="Enter your name"
+                  maxLength={20}
+                  className="input-field flex-1"
+                  autoFocus
+                />
+                <button
+                  onClick={handleNameSubmit}
+                  className="btn btn-primary px-6"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => {
+                    setNameInput(currentPlayerName);
+                    setIsEditingName(false);
+                  }}
+                  className="btn btn-outline px-6"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-slate-500 mt-2">This name will be shown during the game and in the leaderboard</p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
