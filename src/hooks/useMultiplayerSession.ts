@@ -209,7 +209,16 @@ export function useMultiplayerSession(options: UseMultiplayerSessionOptions) {
   );
 
   // Update player name
-  const updatePlayerName = useCallback((newName: string) => {
+  const updatePlayerName = useCallback(async (newName: string) => {
+    // Update the presence tracking with the new name
+    if (channelRef.current) {
+      await channelRef.current.track({
+        name: newName,
+        score: 0,
+        handPosition: null,
+      });
+    }
+
     setState((prev) => {
       const newPlayers = new Map(prev.players);
       const player = newPlayers.get(playerIdRef.current);

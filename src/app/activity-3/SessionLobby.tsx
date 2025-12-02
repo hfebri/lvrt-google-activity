@@ -52,18 +52,18 @@ export default function SessionLobby({
           {/* Player Name Input */}
           <div className="max-w-md mx-auto mt-6">
             {!isEditingName ? (
-              <div className="flex items-center justify-center gap-3 bg-surface/30 border border-slate-200 rounded-lg p-3">
-                <User size={20} className="text-primary" />
-                <span className="font-semibold text-foreground">{currentPlayerName}</span>
+              <div className="flex items-center justify-center gap-2 sm:gap-3 bg-surface/30 border border-slate-200 rounded-lg p-2 sm:p-3">
+                <User size={18} className="text-primary flex-shrink-0" />
+                <span className="font-semibold text-foreground text-sm sm:text-base truncate">{currentPlayerName}</span>
                 <button
                   onClick={() => setIsEditingName(true)}
-                  className="text-xs text-primary hover:text-primary-hover underline ml-2"
+                  className="text-xs text-primary hover:text-primary-hover underline ml-auto flex-shrink-0"
                 >
-                  Change Name
+                  Change
                 </button>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={nameInput}
@@ -71,27 +71,29 @@ export default function SessionLobby({
                   onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
                   placeholder="Enter your name"
                   maxLength={20}
-                  className="input-field flex-1"
+                  className="input-field flex-1 text-sm sm:text-base"
                   autoFocus
                 />
-                <button
-                  onClick={handleNameSubmit}
-                  className="btn btn-primary px-6"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setNameInput(currentPlayerName);
-                    setIsEditingName(false);
-                  }}
-                  className="btn btn-outline px-6"
-                >
-                  Cancel
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleNameSubmit}
+                    className="btn btn-primary flex-1 sm:flex-none px-4 sm:px-6 text-sm sm:text-base"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setNameInput(currentPlayerName);
+                      setIsEditingName(false);
+                    }}
+                    className="btn btn-outline flex-1 sm:flex-none px-4 sm:px-6 text-sm sm:text-base"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             )}
-            <p className="text-xs text-slate-500 mt-2">This name will be shown during the game and in the leaderboard</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-2 text-center">This name will be shown in the game and leaderboard</p>
           </div>
         </div>
 
