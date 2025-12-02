@@ -19,8 +19,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
     relationship: "Family",
     name: "",
     tone: "Heartfelt",
-    keyMessage: "",
-    additionalContext: ""
+    keyMessage: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -101,10 +100,10 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
       
       <div className="mb-8 text-center">
         <span className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs tracking-widest uppercase mb-4">
-          Step {step} of 3
+          Step {step} of 2
         </span>
         <div className="flex justify-center gap-2 mb-2">
-          {[1, 2, 3].map(i => (
+          {[1, 2].map(i => (
             <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-primary' : 'w-2 bg-slate-200'}`} />
           ))}
         </div>
@@ -176,12 +175,11 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
               </div>
               
               <div className="group">
-                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Key Message</label>
-                <textarea 
-                  name="keyMessage" 
-                  value={formData.keyMessage} 
-                  onChange={handleChange} 
-                  required 
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1"> Message (Optional)</label>
+                <textarea
+                  name="keyMessage"
+                  value={formData.keyMessage}
+                  onChange={handleChange}
                   placeholder="e.g. Sorry I can't come home this year..."
                   rows={4}
                   className="input-field hover:bg-slate-50 placeholder:text-slate-400 text-slate-800 resize-none"
@@ -191,35 +189,6 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
             
             <div className="mt-10 flex flex-col-reverse sm:flex-row justify-between gap-4">
               <button type="button" className="btn btn-outline flex-1 sm:flex-none" onClick={() => setStep(1)}>
-                <ChevronLeft size={18} /> Back
-              </button>
-              <button type="button" className="btn btn-primary flex-1 sm:flex-none" onClick={() => setStep(3)}>
-                Next Step <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-3xl font-serif text-primary mb-8 text-center">Final Touches</h2>
-            
-            <div className="space-y-6">
-              <div className="group">
-                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Additional Context (Optional)</label>
-                <textarea 
-                  name="additionalContext" 
-                  value={formData.additionalContext} 
-                  onChange={handleChange} 
-                  placeholder="e.g. Mention our childhood memories..."
-                  rows={4}
-                  className="input-field hover:bg-slate-50 placeholder:text-slate-400 text-slate-800 resize-none"
-                />
-              </div>
-            </div>
-            
-            <div className="mt-10 flex flex-col-reverse sm:flex-row justify-between gap-4">
-              <button type="button" className="btn btn-outline flex-1 sm:flex-none" onClick={() => setStep(2)}>
                 <ChevronLeft size={18} /> Back
               </button>
               <button type="submit" className="btn btn-primary flex-1 sm:flex-none">
