@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Download } from "lucide-react";
 import type { SocialSharingText } from "@/lib/socialSharingTypes";
 
 interface PosterDisplayProps {
@@ -16,6 +16,21 @@ interface PosterDisplayProps {
 
 export default function PosterDisplay({ posterUrl, brandName, tagline }: PosterDisplayProps) {
   const posterRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = posterUrl;
+    link.download = `ramadan-poster-${brandName.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Check if posterUrl is a short URL (Supabase) or long base64
+  const isBase64 = posterUrl.startsWith('data:');
+  const qrCodeUrl = isBase64
+    ? (typeof window !== 'undefined' ? `${window.location.origin}/activity-2` : 'https://leverate.com')
+    : posterUrl;
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 items-start justify-center animate-in fade-in duration-700">
@@ -51,17 +66,30 @@ export default function PosterDisplay({ posterUrl, brandName, tagline }: PosterD
 
         <div className="glass-panel p-6 space-y-6">
           <div className="flex flex-col gap-4">
-            <Link href="/" className="btn btn-primary w-full no-underline">
+            <button
+              onClick={handleDownload}
+              className="btn btn-primary w-full"
+            >
+              <Download size={20} /> Download Poster
+            </button>
+            <Link href="/" className="btn btn-outline w-full no-underline">
               <RotateCcw size={20} /> Start Over
             </Link>
           </div>
         </div>
 
         <div className="glass-panel p-6 text-center">
-          <p className="text-gray-400 text-sm mb-4 uppercase tracking-widest">Scan to Download</p>
+          <p className="text-gray-400 text-sm mb-4 uppercase tracking-widest">
+            {isBase64 ? 'Share This Page' : 'Scan to Download'}
+          </p>
           <div className="bg-white p-4 rounded-xl inline-block shadow-lg">
-            <QRCodeSVG value="https://leverate.com" size={120} />
+            <QRCodeSVG value={qrCodeUrl} size={120} />
           </div>
+          <p className="text-xs text-slate-500 mt-3">
+            {isBase64
+              ? 'Scan to view page • Use download button to save'
+              : 'Scan with your phone to download image'}
+          </p>
         </div>
       </div>
     </div>

@@ -25,19 +25,19 @@ export default function ModeSelection({
           </Link>
         </div>
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-serif font-bold text-primary mb-4">
+          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-primary mb-4">
             Takjil War
           </h1>
-          <p className="text-xl text-gray-400">
+          <p className="text-lg sm:text-xl text-slate-700">
             Choose your game mode
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
           {/* Single Player Mode */}
           <button
             onClick={onSelectSinglePlayer}
-            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
+            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-slate-200 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)] touch-manipulation min-h-[180px]"
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
@@ -58,7 +58,7 @@ export default function ModeSelection({
               <h2 className="text-2xl font-serif font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                 Single Player
               </h2>
-              <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
+              <p className="text-slate-600 group-hover:text-slate-800 transition-colors">
                 Play solo and compete for the high score
               </p>
             </div>
@@ -67,7 +67,7 @@ export default function ModeSelection({
           {/* Multiplayer Mode */}
           <button
             onClick={onSelectMultiplayer}
-            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-white/5 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)]"
+            className="group relative bg-surface/50 backdrop-blur-md rounded-2xl p-6 border border-slate-200 hover:border-primary/50 hover:bg-surface-hover/60 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_0_25px_rgba(192,160,98,0.2)] touch-manipulation min-h-[180px]"
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
@@ -88,14 +88,14 @@ export default function ModeSelection({
               <h2 className="text-2xl font-serif font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                 Multiplayer
               </h2>
-              <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
+              <p className="text-slate-600 group-hover:text-slate-800 transition-colors">
                 Compete with friends in real-time
               </p>
             </div>
           </button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-primary/70">
+        <div className="mt-6 text-center text-xs sm:text-sm text-primary/80 font-medium px-4">
           <p>Use hand gestures to collect takjil items!</p>
           <p className="mt-1">Pinch your thumb and index finger to grab items</p>
         </div>

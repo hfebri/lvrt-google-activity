@@ -57,8 +57,8 @@ export default function WebcamCapture({ onCapture }: WebcamCaptureProps) {
   };
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md mx-auto animate-in fade-in zoom-in duration-500">
-      <div className="relative w-full aspect-[9/16] bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group">
+    <div className="flex flex-col items-center w-full max-w-md mx-auto animate-in fade-in zoom-in duration-500 px-4">
+      <div className="relative w-full aspect-[3/4] sm:aspect-[9/16] bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group">
         {/* Viewfinder Overlay */}
         <div className="absolute inset-0 pointer-events-none z-20 opacity-50">
           <div className="absolute top-6 left-6 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg" />
@@ -80,15 +80,14 @@ export default function WebcamCapture({ onCapture }: WebcamCaptureProps) {
               mirrored={true}
               videoConstraints={{
                 facingMode: "user",
-                aspectRatio: 9 / 16,
               }}
               onUserMedia={() => setIsWebcamReady(true)}
             />
             {countdown !== null && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-30">
                 <div className="text-center">
-                  <div className="text-8xl font-bold text-white animate-ping mb-4">{countdown}</div>
-                  <p className="text-xl text-primary font-semibold tracking-widest uppercase">Get Ready!</p>
+                  <div className="text-6xl sm:text-8xl font-bold text-white animate-ping mb-4">{countdown}</div>
+                  <p className="text-lg sm:text-xl text-primary font-semibold tracking-widest uppercase">Get Ready!</p>
                 </div>
               </div>
             )}
@@ -96,22 +95,22 @@ export default function WebcamCapture({ onCapture }: WebcamCaptureProps) {
         )}
       </div>
 
-      <div className="mt-8 w-full flex justify-center">
+      <div className="mt-6 sm:mt-8 w-full flex justify-center px-4">
         {!imgSrc ? (
-          <button 
-            onClick={capture} 
-            className="group relative flex items-center justify-center w-20 h-20 rounded-full bg-white border-4 border-gray-200 shadow-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+          <button
+            onClick={capture}
+            className="group relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white border-4 border-gray-200 shadow-lg hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             disabled={countdown !== null && countdown > 0}
           >
-            <div className="w-16 h-16 rounded-full border-2 border-black group-hover:bg-gray-100 transition-colors" />
-            <Camera className="absolute text-gray-800" size={32} />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-black group-hover:bg-gray-100 transition-colors" />
+            <Camera className="absolute text-gray-800" size={28} />
           </button>
         ) : (
-          <div className="flex gap-4 w-full">
-            <button onClick={retake} className="btn flex-1 bg-red-500/80 hover:bg-red-600 text-white border-none">
+          <div className="flex gap-3 sm:gap-4 w-full">
+            <button onClick={retake} className="btn flex-1 bg-red-500/80 hover:bg-red-600 text-white border-none min-h-[44px] touch-manipulation">
               <RefreshCcw size={20} /> Retake
             </button>
-            <button onClick={confirm} className="btn btn-primary flex-1">
+            <button onClick={confirm} className="btn btn-primary flex-1 min-h-[44px] touch-manipulation">
               <Check size={20} /> Use Photo
             </button>
           </div>

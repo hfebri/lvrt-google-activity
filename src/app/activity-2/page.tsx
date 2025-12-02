@@ -106,10 +106,10 @@ export default function Activity2Page() {
           </Link>
           
           <div className="text-center max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-hover to-white">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-primary">
               Brand Star Generator
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-slate-600 text-lg">
               Step into the spotlight. Choose an industry and let AI transform your photo into a stunning Ramadan campaign.
             </p>
           </div>
@@ -118,28 +118,28 @@ export default function Activity2Page() {
         <div className="flex justify-center min-h-[500px]">
           {step === "industry" && (
             <div className="w-full">
-              <h2 className="text-2xl font-serif text-center text-white mb-8">Choose Your Industry</h2>
+              <h2 className="text-2xl font-serif text-center text-foreground mb-8">Choose Your Industry</h2>
               <IndustrySelector onSelect={handleIndustrySelect} />
             </div>
           )}
 
           {step === "camera" && (
             <div className="w-full">
-              <h2 className="text-2xl font-serif text-center text-white mb-8">Take Your Photo</h2>
+              <h2 className="text-2xl font-serif text-center text-foreground mb-8">Take Your Photo</h2>
               <WebcamCapture onCapture={handleCapture} />
             </div>
           )}
 
           {step === "loading" && (
-            <div className="flex flex-col items-center justify-center p-12 text-center w-full max-w-md mx-auto bg-surface/50 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+            <div className="flex flex-col items-center justify-center p-12 text-center w-full max-w-md mx-auto bg-surface/50 backdrop-blur-md rounded-2xl border border-slate-200 shadow-2xl">
               <div className="relative mb-8">
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
                 <Loader2 className="relative text-primary animate-spin" size={64} />
               </div>
               <h3 className="text-2xl font-serif text-primary mb-2">{loadingText}</h3>
-              <p className="text-gray-400 mb-8 text-sm">AI is crafting your masterpiece...</p>
+              <p className="text-slate-600 mb-8 text-sm">AI is crafting your masterpiece...</p>
               
-              <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="w-full h-1 bg-slate-200 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-primary to-primary-hover transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }} 

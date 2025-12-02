@@ -28,7 +28,7 @@ export default function SessionLobby({
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">
             Game Lobby
           </h1>
-          <p className="text-gray-400">
+          <p className="text-slate-700">
             {isHost ? "Share this code with your friends!" : "Waiting for host to start..."}
           </p>
         </div>
@@ -36,18 +36,18 @@ export default function SessionLobby({
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           {/* Session Code & QR Code */}
           <div className="text-center">
-            <div className="bg-surface/50 border border-white/10 rounded-xl p-6 mb-4">
-              <p className="text-sm text-gray-400 mb-2">Session Code</p>
+            <div className="bg-surface/50 border border-slate-200 rounded-xl p-6 mb-4">
+              <p className="text-sm text-slate-600 mb-2">Session Code</p>
               <p className="text-5xl font-bold text-primary tracking-wider font-mono">
                 {sessionCode}
               </p>
             </div>
 
-            <div className="bg-white p-4 rounded-xl inline-block shadow-lg">
+            <div className="bg-white p-4 rounded-xl inline-block shadow-lg border border-slate-100">
               <QRCodeSVG value={sessionUrl} size={200} level="H" />
             </div>
 
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-slate-500 mt-4">
               Scan QR code or enter code manually
             </p>
           </div>
@@ -59,14 +59,14 @@ export default function SessionLobby({
             </h2>
             <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
               {playerArray.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 border border-dashed border-white/10 rounded-lg">
+                <div className="text-center py-8 text-slate-500 border border-dashed border-slate-300 rounded-lg">
                   <p>Waiting for players to join...</p>
                 </div>
               ) : (
                 playerArray.map((player, index) => (
                   <div
                     key={player.id}
-                    className="flex items-center gap-3 bg-surface/30 rounded-lg p-3 border border-white/5"
+                    className="flex items-center gap-3 bg-surface/30 rounded-lg p-3 border border-slate-200"
                   >
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm"
@@ -78,7 +78,7 @@ export default function SessionLobby({
                       <p className="font-semibold text-foreground">
                         {player.name}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-slate-600">
                         {player.id === players.keys().next().value && isHost
                           ? "Host"
                           : "Player"}
@@ -113,9 +113,9 @@ export default function SessionLobby({
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 bg-surface/30 border border-white/5 rounded-lg p-4">
+        <div className="mt-8 bg-surface/30 border border-slate-200 rounded-lg p-4">
           <h3 className="font-serif font-semibold text-primary mb-2">Takjil War Rules:</h3>
-          <ul className="text-sm text-gray-400 space-y-1">
+          <ul className="text-sm text-slate-600 space-y-1">
             <li>• Battle for the best Takjil! Use your hands to snatch treats.</li>
             <li>• Pinch your thumb and index finger to grab items before they're gone.</li>
             <li>• Be faster than your friends, only the quickest hands eat first!</li>

@@ -30,9 +30,22 @@ function Activity3Content() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [joinError, setJoinError] = useState<string>("");
   const [isJoining, setIsJoining] = useState(false);
+  const [playerName, setPlayerName] = useState<string>("Player"); // Initialize with a static value for SSR
+  const [receiptDate, setReceiptDate] = useState<string>("");
 
-  // Generate player name once and store it
-  const playerNameRef = useRef(`Player ${Math.floor(Math.random() * 1000)}`);
+  // Generate player name once on client side only
+  const playerNameRef = useRef("Player"); // Initialize with a static value for SSR
+
+  // Initialize player name and date on client side to avoid hydration mismatch
+  useEffect(() => {
+    // Generate player name once on mount to avoid hydration mismatch
+    const name = `Player ${Math.floor(Math.random() * 1000)}`;
+    playerNameRef.current = name;
+    setPlayerName(name);
+    
+    // Set receipt date on client to avoid SSR/client mismatch
+    setReceiptDate(new Date().toLocaleDateString());
+  }, []);
 
   // Store reference to countdown trigger function
   const countdownTriggerRef = useRef<(() => void) | null>(null);
@@ -207,14 +220,14 @@ function Activity3Content() {
               <div className="glass-panel p-8 text-center mb-8 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-primary to-transparent" />
                 
-                <h2 className="text-3xl font-serif text-white mb-6">Payment Due</h2>
+                <h2 className="text-3xl font-serif text-foreground mb-6">Payment Due</h2>
                 
                 {/* Receipt Paper Effect */}
-                <div className="bg-white text-slate-900 p-6 rounded-sm shadow-lg mb-6 max-w-xs mx-auto relative font-mono text-sm transform rotate-1">
+                <div className="bg-white text-slate-900 p-6 rounded-sm shadow-lg mb-6 max-w-xs mx-auto relative font-mono text-sm transform rotate-1 border border-slate-200">
                   {/* Jagged top/bottom edges (simulated with CSS or SVG if needed, keeping simple for now) */}
                   <div className="border-b-2 border-dashed border-slate-300 pb-4 mb-4 text-center">
                     <h3 className="text-xl font-bold uppercase">Warung Takjil</h3>
-                    <p className="text-xs text-slate-500">Ramadan Nights Special</p>
+                    <p className="text-xs text-slate-500">Ramadan Day Special</p>
                   </div>
                   
                   <div className="space-y-2 mb-4">
@@ -238,7 +251,7 @@ function Activity3Content() {
                   
                   <div className="mt-6 text-center text-xs text-slate-400">
                     <p>Thank you for shopping!</p>
-                    <p>{new Date().toLocaleDateString()}</p>
+                    {receiptDate && <p>{receiptDate}</p>}
                   </div>
                 </div>
                 
@@ -251,7 +264,7 @@ function Activity3Content() {
               </div>
 
               <div className="glass-panel p-6">
-                <h3 className="flex items-center justify-center gap-2 text-xl font-serif text-white mb-6">
+                <h3 className="flex items-center justify-center gap-2 text-xl font-serif text-foreground mb-6">
                   <Trophy className="text-yellow-500" /> Leaderboard
                 </h3>
                 
@@ -263,18 +276,18 @@ function Activity3Content() {
                         className={`flex justify-between items-center p-4 rounded-xl border ${
                           i === 0 
                             ? 'bg-gradient-to-r from-yellow-500/20 to-transparent border-yellow-500/50' 
-                            : 'bg-white/5 border-white/5'
+                            : 'bg-surface/50 border-black/5'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
                             i === 0 ? 'bg-yellow-500 text-black' : 
                             i === 1 ? 'bg-gray-400 text-black' :
-                            i === 2 ? 'bg-amber-700 text-white' : 'bg-white/10 text-gray-400'
+                            i === 2 ? 'bg-amber-700 text-white' : 'bg-black/10 text-gray-600'
                           }`}>
                             {i + 1}
                           </div>
-                          <span className="font-medium text-gray-200">Player {entry.id.toString().slice(0, 4)}</span>
+                          <span className="font-medium text-foreground">Player {entry.id.toString().slice(0, 4)}</span>
                         </div>
                         <span className="font-mono font-bold text-primary">Rp {entry.score.toLocaleString()}</span>
                       </div>

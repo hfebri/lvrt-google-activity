@@ -55,24 +55,30 @@ export async function generateLetter(data: any) {
   }
 }
 
-export async function generateImage(prompt: string) {
+export async function generateImage(prompt: string, letter: string) {
   try {
     console.log('\n🖼️  [Activity 1] Starting image generation...');
     console.time('⏱️  Image Generation');
 
     // Import the Gemini image generation utility
     const { generateImage: geminiGenerateImage } = await import("@/lib/gemini");
+    const { uploadImageToStorage } = await import("@/lib/storage");
 
-    // Enhance the prompt for better letter background
-    const enhancedPrompt = `${prompt}
+    // Enhance the prompt to include the letter text IN the image
+    const enhancedPrompt = `Create a beautiful Ramadan/Eid greeting card image with the following letter text embedded directly in the center:
 
-    Additional requirements:
-    - Center area should be clear/subtle for text overlay with elegant serif font styling
-    - Beautiful Ramadan/Eid theme with sophisticated, warm aesthetics
-    - Font Style: Elegant serif typography (like Crimson Text, Libre Baskerville, Cormorant Garamond style) - NOT generic Times New Roman
-    - No text or watermarks in the image
-    - High quality, vibrant colors with Islamic patterns
-    - Poetic, refined visual style matching elegant Indonesian greetings`;
+"${letter}"
+
+Design requirements:
+- The letter text MUST be clearly visible and readable in the center of the image
+- Use elegant serif typography (like Crimson Text, Libre Baskerville, or Cormorant Garamond style) - NOT generic Times New Roman
+- Place the text in a decorative card/frame in the center
+- Beautiful Ramadan/Eid background with Islamic patterns, crescent moon, mosque silhouettes
+- Warm golden colors, ornate borders, traditional Islamic geometric patterns
+- The text should be in a white/light panel with elegant framing
+- High quality, sophisticated design suitable for sharing
+- Portrait orientation (9:16 aspect ratio)
+- The letter text is the main focus of the card`;
 
     console.log('🎨 Using Gemini Image Preview (1K quality, 9:16 aspect ratio)...');
     console.log(`📝 Enhanced prompt: ${enhancedPrompt}...`);
@@ -88,11 +94,33 @@ export async function generateImage(prompt: string) {
     const imageTime = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`✅ Image generated in ${imageTime}s`);
     console.log(`📊 Image size: ${(result.base64Data.length / 1024).toFixed(2)} KB (base64)`);
-    console.timeEnd('⏱️  Image Generation');
-    console.log('✨ Image generation complete!\n');
 
-    // Return the data URL for direct display in the browser
-    return result.imageUrl;
+    // Upload to Supabase Storage
+    console.log('☁️  Uploading to Supabase Storage...');
+    const uploadStartTime = Date.now();
+
+    try {
+      const publicUrl = await uploadImageToStorage(
+        'ramadan-activities', // bucket name
+        'greetings', // folder
+        result.imageUrl // base64 data URL
+      );
+
+      const uploadTime = ((Date.now() - uploadStartTime) / 1000).toFixed(2);
+      console.log(`✅ Uploaded in ${uploadTime}s`);
+      console.log(`🔗 Public URL: ${publicUrl}`);
+      console.timeEnd('⏱️  Image Generation');
+      console.log('✨ Image generation complete!\n');
+
+      // Return the public URL from Supabase Storage
+      return publicUrl;
+    } catch (uploadError) {
+      console.warn('⚠️  Upload to storage failed, falling back to base64:', uploadError);
+      console.timeEnd('⏱️  Image Generation');
+
+      // Fallback to base64 if upload fails
+      return result.imageUrl;
+    }
   } catch (error) {
     console.error("❌ Error generating image:", error);
     throw new Error("Failed to generate image");

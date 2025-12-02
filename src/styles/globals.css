@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #020617; /* Deep Midnight Blue */
-  --color-foreground: #f8fafc; /* Off-white */
+  --color-background: #f8fafc; /* Slate 50 */
+  --color-foreground: #020617; /* Slate 950 */
   
   --color-primary: #c0a062; /* Muted Gold */
   --color-primary-hover: #d4b375;
   
-  --color-surface: #0f172a; /* Slate 900 */
-  --color-surface-hover: #1e293b; /* Slate 800 */
+  --color-surface: #ffffff; /* White */
+  --color-surface-hover: #e2e8f0; /* Slate 200 */
   
   --color-accent: #0ea5e9; /* Sky Blue */
   --color-gold: #ffd700;
@@ -28,9 +28,12 @@
   html,
   body {
     @apply max-w-[100vw] overflow-x-hidden font-sans bg-background text-foreground antialiased;
-    background-image: 
-      radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 100% 0%, rgba(192, 160, 98, 0.1) 0%, transparent 30%);
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 0%, rgba(192, 160, 98, 0.05) 0%, transparent 30%);
+    /* Support for notched devices */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   a {
@@ -52,11 +55,11 @@
   }
 
   .btn {
-    @apply px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-300 border-none flex items-center justify-center gap-2;
+    @apply px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-300 border-none flex items-center justify-center gap-2 touch-manipulation;
   }
 
   .btn-primary {
-    @apply bg-primary text-background hover:bg-primary-hover shadow-[0_0_15px_rgba(192,160,98,0.3)] hover:shadow-[0_0_25px_rgba(192,160,98,0.5)] transform hover:-translate-y-0.5;
+    @apply bg-primary text-background hover:bg-primary-hover active:bg-primary-hover shadow-[0_0_15px_rgba(192,160,98,0.3)] hover:shadow-[0_0_25px_rgba(192,160,98,0.5)] active:shadow-[0_0_20px_rgba(192,160,98,0.4)] transform hover:-translate-y-0.5 active:scale-95;
   }
   
   .btn-outline {
@@ -64,15 +67,28 @@
   }
 
   .card {
-    @apply bg-surface/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 transition-all duration-300 hover:bg-surface-hover/60 hover:border-primary/30 hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)];
+    @apply bg-surface/50 backdrop-blur-md border border-slate-200 rounded-2xl p-6 transition-all duration-300 hover:bg-surface-hover/60 hover:border-primary/30 hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)];
   }
   
   .glass-panel {
-    @apply bg-surface/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+    @apply bg-surface/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl;
   }
   
   .input-field {
-    @apply w-full bg-black/20 border-b-2 border-white/10 px-4 py-3 text-lg focus:outline-none focus:border-primary transition-colors rounded-t-lg;
+    @apply w-full bg-slate-100 border-b-2 border-slate-200 px-4 py-3 text-base sm:text-lg focus:outline-none focus:border-primary transition-colors rounded-t-lg touch-manipulation;
+  }
+
+  /* Mobile-specific utilities */
+  .mirrored {
+    transform: scaleX(-1);
+  }
+
+  /* Ensure touch targets are at least 44x44px */
+  button,
+  a[role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
   }
 }
 

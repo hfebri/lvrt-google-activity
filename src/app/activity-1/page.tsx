@@ -30,10 +30,10 @@ export default function Activity1Page() {
           </Link>
           
           <div className="text-center max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-hover to-white">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-primary">
               Lebaran Letter Creator
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-slate-600 text-lg">
               Craft a heartfelt, AI-generated Eid greeting letter with a bespoke design for your loved ones.
             </p>
           </div>

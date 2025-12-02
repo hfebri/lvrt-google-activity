@@ -59,7 +59,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
       await new Promise(resolve => setTimeout(resolve, 300));
       const imageProgress = simulateProgress(50, 95, 25000);
 
-      const imageUrl = await generateImage(prompt);
+      const imageUrl = await generateImage(prompt, letter);
       clearInterval(imageProgress);
       setProgress(100);
 
@@ -95,7 +95,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-surface/50 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
+    <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-surface/80 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-slate-200 shadow-2xl relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       
@@ -105,7 +105,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
         </span>
         <div className="flex justify-center gap-2 mb-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-primary' : 'w-2 bg-white/10'}`} />
+            <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-primary' : 'w-2 bg-slate-200'}`} />
           ))}
         </div>
       </div>
@@ -113,16 +113,16 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
       <div className="min-h-[300px]">
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-3xl font-serif text-white mb-8 text-center">Who is this for?</h2>
+            <h2 className="text-3xl font-serif text-primary mb-8 text-center">Who is this for?</h2>
             
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-primary/80 text-sm font-semibold mb-2 ml-1">Relationship</label>
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Relationship</label>
                 <select 
                   name="relationship" 
                   value={formData.relationship} 
                   onChange={handleChange}
-                  className="input-field appearance-none cursor-pointer hover:bg-white/5"
+                  className="input-field appearance-none cursor-pointer hover:bg-slate-50 text-slate-800"
                 >
                   <option value="Family">Family</option>
                   <option value="Friend">Friend</option>
@@ -133,7 +133,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
               </div>
               
               <div className="group">
-                <label className="block text-primary/80 text-sm font-semibold mb-2 ml-1">Recipient Name</label>
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Recipient Name</label>
                 <input 
                   type="text" 
                   name="name" 
@@ -141,7 +141,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
                   onChange={handleChange} 
                   required 
                   placeholder="e.g. Budi"
-                  className="input-field hover:bg-white/5 placeholder:text-gray-600"
+                  className="input-field hover:bg-slate-50 placeholder:text-slate-400 text-slate-800"
                 />
               </div>
             </div>
@@ -156,16 +156,16 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
 
         {step === 2 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-3xl font-serif text-white mb-8 text-center">Set the Mood</h2>
+            <h2 className="text-3xl font-serif text-primary mb-8 text-center">Set the Mood</h2>
             
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-primary/80 text-sm font-semibold mb-2 ml-1">Tone</label>
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Tone</label>
                 <select 
                   name="tone" 
                   value={formData.tone} 
                   onChange={handleChange}
-                  className="input-field appearance-none cursor-pointer hover:bg-white/5"
+                  className="input-field appearance-none cursor-pointer hover:bg-slate-50 text-slate-800"
                 >
                   <option value="Heartfelt">Heartfelt</option>
                   <option value="Casual">Casual</option>
@@ -176,7 +176,7 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
               </div>
               
               <div className="group">
-                <label className="block text-primary/80 text-sm font-semibold mb-2 ml-1">Key Message</label>
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Key Message</label>
                 <textarea 
                   name="keyMessage" 
                   value={formData.keyMessage} 
@@ -184,12 +184,12 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
                   required 
                   placeholder="e.g. Sorry I can't come home this year..."
                   rows={4}
-                  className="input-field hover:bg-white/5 placeholder:text-gray-600 resize-none"
+                  className="input-field hover:bg-slate-50 placeholder:text-slate-400 text-slate-800 resize-none"
                 />
               </div>
             </div>
             
-            <div className="mt-10 flex justify-between gap-4">
+            <div className="mt-10 flex flex-col-reverse sm:flex-row justify-between gap-4">
               <button type="button" className="btn btn-outline flex-1 sm:flex-none" onClick={() => setStep(1)}>
                 <ChevronLeft size={18} /> Back
               </button>
@@ -202,23 +202,23 @@ export default function QuizForm({ onComplete }: QuizFormProps) {
 
         {step === 3 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-3xl font-serif text-white mb-8 text-center">Final Touches</h2>
+            <h2 className="text-3xl font-serif text-primary mb-8 text-center">Final Touches</h2>
             
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-primary/80 text-sm font-semibold mb-2 ml-1">Additional Context (Optional)</label>
+                <label className="block text-slate-700 text-sm font-semibold mb-2 ml-1">Additional Context (Optional)</label>
                 <textarea 
                   name="additionalContext" 
                   value={formData.additionalContext} 
                   onChange={handleChange} 
                   placeholder="e.g. Mention our childhood memories..."
                   rows={4}
-                  className="input-field hover:bg-white/5 placeholder:text-gray-600 resize-none"
+                  className="input-field hover:bg-slate-50 placeholder:text-slate-400 text-slate-800 resize-none"
                 />
               </div>
             </div>
             
-            <div className="mt-10 flex justify-between gap-4">
+            <div className="mt-10 flex flex-col-reverse sm:flex-row justify-between gap-4">
               <button type="button" className="btn btn-outline flex-1 sm:flex-none" onClick={() => setStep(2)}>
                 <ChevronLeft size={18} /> Back
               </button>

@@ -29,7 +29,7 @@ export default function HostOrJoin({
           <h1 className="text-5xl font-serif font-bold text-primary mb-4">
             Multiplayer
           </h1>
-          <p className="text-xl text-gray-400">
+          <p className="text-xl text-slate-700">
             Choose how you want to play
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function HostOrJoin({
           {/* Host Room */}
           <button
             onClick={onSelectHost}
-            className="group relative card p-6 hover:shadow-2xl transition-all duration-300 border-2 border-white/10 hover:border-primary/50 hover:scale-105"
+            className="group relative card p-6 hover:shadow-2xl transition-all duration-300 border-2 border-slate-200 hover:border-primary/50 hover:scale-105"
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/30 transition-colors">
@@ -59,10 +59,10 @@ export default function HostOrJoin({
               <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
                 Host Room
               </h2>
-              <p className="text-gray-400">
+              <p className="text-slate-600">
                 Create a new game session and invite friends
               </p>
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-4 text-sm text-slate-500">
                 <p>• Generate session code</p>
                 <p>• Share QR code</p>
                 <p>• Start game when ready</p>
@@ -73,7 +73,7 @@ export default function HostOrJoin({
           {/* Join Room */}
           <button
             onClick={onSelectJoin}
-            className="group relative card p-6 hover:shadow-2xl transition-all duration-300 border-2 border-white/10 hover:border-primary/50 hover:scale-105"
+            className="group relative card p-6 hover:shadow-2xl transition-all duration-300 border-2 border-slate-200 hover:border-primary/50 hover:scale-105"
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/30 transition-colors">
@@ -94,10 +94,10 @@ export default function HostOrJoin({
               <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
                 Join Room
               </h2>
-              <p className="text-gray-400">
+              <p className="text-slate-600">
                 Enter a session code to join an existing game
               </p>
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-4 text-sm text-slate-500">
                 <p>• Enter session code</p>
                 <p>• Wait in lobby</p>
                 <p>• Play when host starts</p>
@@ -106,7 +106,7 @@ export default function HostOrJoin({
           </button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-slate-500">
           <p>💡 Tip: Use hand gestures to collect takjil items!</p>
           <p className="mt-1">Pinch your thumb and index finger to grab items</p>
         </div>

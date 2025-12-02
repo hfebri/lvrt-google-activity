@@ -22,10 +22,10 @@ export default function Home() {
           <div className="inline-block mb-4 px-4 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm tracking-widest uppercase">
             Ramadan 1446 H
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-hover to-white drop-shadow-sm">
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-primary drop-shadow-sm">
             Ramadan Nights
           </h1>
-          <p className="text-xl text-gray-400 leading-relaxed">
+          <p className="text-xl text-slate-600 leading-relaxed">
             Experience the magic of the holy month with Leverate. 
             Connect, create, and celebrate with our interactive digital experiences.
           </p>

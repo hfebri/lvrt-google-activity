@@ -65,6 +65,7 @@ export async function generatePoster(industry: string, imageBase64: string) {
     console.time('⏱️  Poster Image Generation');
 
     const { generateImageWithPhoto } = await import("@/lib/gemini");
+    const { uploadImageToStorage } = await import("@/lib/storage");
 
     // Create detailed prompt for the poster
     const imagePrompt = `Create a professional advertisement poster for ${brandName}.
@@ -122,15 +123,43 @@ export async function generatePoster(industry: string, imageBase64: string) {
     console.log(`📊 Output image size: ${(result.base64Data.length / 1024).toFixed(2)} KB (base64)`);
     console.timeEnd('⏱️  Poster Image Generation');
 
-    console.timeEnd('⏱️  Total Poster Generation');
-    console.log('✨ Poster generation complete!\n');
+    // Upload to Supabase Storage
+    console.log('☁️  Uploading to Supabase Storage...');
+    const uploadStartTime = Date.now();
 
-    return {
-      posterUrl: result.imageUrl,
-      brandName,
-      tagline,
-      sharingText: undefined,
-    };
+    try {
+      const publicUrl = await uploadImageToStorage(
+        'ramadan-activities', // bucket name
+        'posters', // folder
+        result.imageUrl, // base64 data URL
+        `${brandName.replace(/\s+/g, '-').toLowerCase()}-poster.jpg` // filename
+      );
+
+      const uploadTime = ((Date.now() - uploadStartTime) / 1000).toFixed(2);
+      console.log(`✅ Uploaded in ${uploadTime}s`);
+      console.log(`🔗 Public URL: ${publicUrl}`);
+      console.timeEnd('⏱️  Total Poster Generation');
+      console.log('✨ Poster generation complete!\n');
+
+      return {
+        posterUrl: publicUrl,
+        brandName,
+        tagline,
+        sharingText: undefined,
+      };
+    } catch (uploadError) {
+      console.warn('⚠️  Upload to storage failed, falling back to base64:', uploadError);
+      console.timeEnd('⏱️  Total Poster Generation');
+      console.log('✨ Poster generation complete (with fallback)!\n');
+
+      // Fallback to base64 if upload fails
+      return {
+        posterUrl: result.imageUrl,
+        brandName,
+        tagline,
+        sharingText: undefined,
+      };
+    }
   } catch (error) {
     console.error("❌ Error generating poster:", error);
     throw new Error("Failed to generate poster image");

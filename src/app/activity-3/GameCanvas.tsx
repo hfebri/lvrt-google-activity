@@ -594,7 +594,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
   };
 
   return (
-    <div className="relative w-full mx-auto bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group animate-in fade-in zoom-in duration-500" style={{ height: '80vh', maxWidth: '1200px' }}>
+    <div className="relative w-full mx-auto bg-black rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/10 group animate-in fade-in zoom-in duration-500" style={{ height: 'min(80vh, 600px)', maxWidth: '1200px' }}>
       <Webcam
         ref={webcamRef}
         className="absolute inset-0 w-full h-full object-cover mirrored"
@@ -609,24 +609,24 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       />
       
       {gameStarted && (
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
-          <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg flex items-center gap-3">
-            <div className="bg-primary/20 p-2 rounded-full">
-              <Trophy className="text-primary" size={24} />
+        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex justify-between items-start z-20 gap-2">
+          <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-4 border border-slate-200 shadow-lg flex items-center gap-2 sm:gap-3">
+            <div className="bg-primary/20 p-1 sm:p-2 rounded-full">
+              <Trophy className="text-primary" size={20} />
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Bill</p>
-              <p className="text-2xl font-bold text-white font-mono">Rp {score.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-semibold">Bill</p>
+              <p className="text-base sm:text-2xl font-bold text-slate-900 font-mono">Rp {score.toLocaleString()}</p>
             </div>
           </div>
 
-          <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg flex items-center gap-3">
-            <div className={`p-2 rounded-full ${timeLeft <= 5 ? 'bg-red-500/20 animate-pulse' : 'bg-blue-500/20'}`}>
-              <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-400'}`} size={24} />
+          <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-2 sm:p-4 border border-slate-200 shadow-lg flex items-center gap-2 sm:gap-3">
+            <div className={`p-1 sm:p-2 rounded-full ${timeLeft <= 5 ? 'bg-red-500/20 animate-pulse' : 'bg-blue-500/20'}`}>
+              <Timer className={`${timeLeft <= 5 ? 'text-red-500' : 'text-blue-500'}`} size={20} />
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Time</p>
-              <p className={`text-2xl font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-white'}`}>{timeLeft}s</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider font-semibold">Time</p>
+              <p className={`text-base sm:text-2xl font-bold font-mono ${timeLeft <= 5 ? 'text-red-500' : 'text-slate-900'}`}>{timeLeft}s</p>
             </div>
           </div>
         </div>
@@ -672,31 +672,31 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
       )}
 
       {!gameStarted && calibrated && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-30">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-30 px-4">
           <div className="text-center">
             {countdown !== null ? (
               // Countdown Display
               <div className="animate-in zoom-in duration-300">
-                <div className="text-9xl font-bold text-primary mb-4 drop-shadow-[0_0_30px_rgba(192,160,98,0.8)] animate-pulse">
+                <div className="text-6xl sm:text-9xl font-bold text-primary mb-4 drop-shadow-[0_0_30px_rgba(192,160,98,0.8)] animate-pulse">
                   {countdown}
                 </div>
-                <p className="text-2xl text-white font-semibold">Get Ready!</p>
+                <p className="text-xl sm:text-2xl text-white font-semibold">Get Ready!</p>
               </div>
             ) : (
               // Start Screen
               <>
-                <h3 className="text-4xl font-serif text-white mb-6">Takjil War!</h3>
+                <h3 className="text-2xl sm:text-4xl font-serif text-white mb-6">Takjil War!</h3>
                 {(!isMultiplayer || (multiplayerSession?.state.isHost)) && showStartButton && (
                   <button
                     onClick={handleStartClick}
-                    className="btn btn-primary mx-auto text-xl px-12 py-4 shadow-[0_0_30px_rgba(192,160,98,0.4)] hover:shadow-[0_0_50px_rgba(192,160,98,0.6)] hover:scale-105 transition-all"
+                    className="btn btn-primary mx-auto text-base sm:text-xl px-8 sm:px-12 py-3 sm:py-4 shadow-[0_0_30px_rgba(192,160,98,0.4)] hover:shadow-[0_0_50px_rgba(192,160,98,0.6)] hover:scale-105 active:scale-95 transition-all touch-manipulation min-h-[44px]"
                   >
                     <Play fill="currentColor" /> Start Game
                   </button>
                 )}
                 {isMultiplayer && !multiplayerSession?.state.isHost && (
-                  <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                    <p className="text-xl text-gray-300">Waiting for host to start the game...</p>
+                  <div className="bg-surface/80 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-white/10">
+                    <p className="text-base sm:text-xl text-gray-300">Waiting for host to start the game...</p>
                     <div className="mt-4 flex justify-center">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce mx-1" style={{ animationDelay: '150ms' }}></div>
@@ -704,7 +704,7 @@ export default function GameCanvas({ onEnd, isMultiplayer = false, multiplayerSe
                     </div>
                   </div>
                 )}
-                <div className="mt-6 text-gray-300 text-lg space-y-2">
+                <div className="mt-6 text-gray-300 text-sm sm:text-lg space-y-2">
                   <p>Grab the takjil before others do!</p>
                   <p><span className="text-primary font-bold">Pinch</span> to collect. Don't let them steal it!</p>
                 </div>
