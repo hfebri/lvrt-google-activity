@@ -31,7 +31,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 gap-8 max-w-80 mx-auto">
           <ActivityCard
             title="Takjil War"
             description="Test your reflexes in this fast-paced hand-tracking game. Catch the takjil before sunset!"
