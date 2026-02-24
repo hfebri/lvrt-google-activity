@@ -33,7 +33,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto">
           <ActivityCard
-            title="Takjil Rush"
+            title="Takjil War"
             description="Test your reflexes in this fast-paced hand-tracking game. Catch the takjil before sunset!"
             icon={Gamepad2}
             href="/activity-3"
