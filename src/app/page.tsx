@@ -1,5 +1,5 @@
 import ActivityCard from "@/components/ActivityCard";
-import { Mail, Camera, Gamepad2, Moon, Star } from "lucide-react";
+import { Gamepad2, Moon, Star } from "lucide-react";
 
 export default function Home() {
   return (
@@ -20,7 +20,7 @@ export default function Home() {
       <div className="container relative z-10">
         <div className="text-center mb-20 max-w-3xl mx-auto">
           <div className="inline-block mb-4 px-4 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm tracking-widest uppercase">
-            Ramadan 1446 H
+            Ramadan 1447 H
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-primary drop-shadow-sm">
             Ramadan Nights
@@ -31,19 +31,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <ActivityCard
-            title="Greeting Letter"
-            description="Craft a heartfelt, AI-generated Eid greeting letter with a bespoke design for your loved ones."
-            icon={Mail}
-            href="/activity-1"
-          />
-          <ActivityCard
-            title="Brand Star"
-            description="Step into the spotlight. Let AI transform your photo into a stunning Ramadan campaign."
-            icon={Camera}
-            href="/activity-2"
-          />
+        <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto">
           <ActivityCard
             title="Takjil Rush"
             description="Test your reflexes in this fast-paced hand-tracking game. Catch the takjil before sunset!"
@@ -51,10 +39,6 @@ export default function Home() {
             href="/activity-3"
           />
         </div>
-        
-        <footer className="mt-24 text-center text-gray-600 text-sm">
-          <p>© 2025 Leverate Group. All rights reserved.</p>
-        </footer>
       </div>
     </main>
   );
