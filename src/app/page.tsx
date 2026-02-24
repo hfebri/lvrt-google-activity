@@ -1,5 +1,5 @@
 import ActivityCard from "@/components/ActivityCard";
-import { Gamepad2, Moon, Star } from "lucide-react";
+import { Mail, Camera, Gamepad2, Moon, Star } from "lucide-react";
 
 export default function Home() {
   return (
@@ -30,8 +30,19 @@ export default function Home() {
             Connect, create, and celebrate with our interactive digital experiences.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 gap-8 max-w-80 mx-auto">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <ActivityCard
+            title="Greeting Letter"
+            description="Craft a heartfelt, AI-generated Eid greeting letter with a bespoke design for your loved ones."
+            icon={Mail}
+            href="/activity-1"
+          />
+          <ActivityCard
+            title="Brand Star"
+            description="Step into the spotlight. Let AI transform your photo into a stunning Ramadan campaign."
+            icon={Camera}
+            href="/activity-2"
+          />
           <ActivityCard
             title="Takjil War"
             description="Test your reflexes in this fast-paced hand-tracking game. Catch the takjil before sunset!"
