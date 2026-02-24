@@ -7,7 +7,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif"
 
 export const metadata: Metadata = {
   title: "Ramadhan Interactive Activities",
-  description: "Celebrate Ramadan with Leverate's interactive experiences.",
+  description: "Celebrate Ramadan with interactive experiences.",
 };
 
 export const viewport: Viewport = {

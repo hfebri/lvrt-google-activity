@@ -26,7 +26,7 @@ export default function Home() {
             Ramadan Nights
           </h1>
           <p className="text-xl text-slate-600 leading-relaxed">
-            Experience the magic of the holy month with Leverate. 
+            Experience the magic of the holy month. 
             Connect, create, and celebrate with our interactive digital experiences.
           </p>
         </div>
