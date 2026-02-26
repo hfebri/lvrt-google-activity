@@ -77,15 +77,15 @@ export async function generatePoster(industry: string, imageBase64: string) {
     Theme: Ramadan/Eid celebration
 
     CRITICAL REQUIREMENTS - CHARACTER CONSISTENCY:
-    - The provided photo shows ONE PERSON - this is the ONLY person who should be the main subject
-    - KEEP THE EXACT SAME PERSON from the provided photo as the SOLE main subject/model
-    - PRESERVE their facial features, face shape, skin tone, and overall appearance EXACTLY
-    - DO NOT change their face, eyes, nose, mouth, or any facial characteristics
-    - The person should be CLEARLY RECOGNIZABLE as the same individual from the input photo
-    - DO NOT add other people's faces in the foreground or as main subjects
-    - Any background people should be minimal, blurred, or silhouettes only
-    - Only enhance the background, setting, and surrounding elements
-    - Keep their natural appearance - do not alter their identity
+    - The provided photo may contain ONE or MORE PEOPLE — identify and include ALL of them
+    - ALL people from the input photo MUST appear as the main subjects of the poster
+    - PRESERVE each person's exact facial features, face shape, skin tone, hair, and overall appearance
+    - DO NOT alter, replace, merge, or obscure any individual's face, eyes, nose, mouth, or facial structure
+    - Every single person must be CLEARLY RECOGNIZABLE as the same individual from the input photo
+    - Maintain natural grouping and relative positioning between people
+    - Only enhance the background, outfits (make Ramadan/Eid appropriate if needed), and surroundings
+    - DO NOT add extra people who are not in the original photo
+    - Keep everyone's natural appearance — do not alter any identity
 
     TEXT REQUIREMENTS - VERY IMPORTANT:
     - MUST include the brand name "${brandName}" prominently in the poster
@@ -98,20 +98,21 @@ export async function generatePoster(industry: string, imageBase64: string) {
     - The brand name should be LARGER and BOLDER than the tagline
     - Center-align the text for professional look
 
-    Visual requirements:
-    - Feature the ONE person from the provided photo prominently as the sole brand ambassador
+    VISUAL REQUIREMENTS:
+    - Feature ALL people from the provided photo prominently as brand ambassadors
+    - If multiple people, arrange them in a warm, natural, celebratory group composition
     - Modern, professional advertising style with commercial aesthetic
     - Vibrant Islamic/Ramadan visual elements (crescent moon, lanterns, mosque silhouettes)
     - Clean composition with decorative borders and patterns
     - Warm, festive color palette (gold, green, deep blue)
     - Industry-appropriate setting and mood for ${industry}
     - High quality, magazine-worthy advertisement
-    - The person should be in the UPPER 2/3 of the poster
+    - All people should occupy the UPPER 2/3 of the poster
     - Bottom 1/3 reserved for brand name and tagline text overlay
     - Professional studio lighting and composition
     - Add subtle Ramadan decorative patterns (geometric shapes, lanterns, crescents)
     - Portrait orientation (9:16 aspect ratio)
-    - Focus should be on the ONE person from the input photo with the brand text clearly visible at bottom`;
+    - Focus should be on ALL people from the input photo with brand text clearly visible at bottom`;
 
     console.log('⚡ Using Gemini 2.5 Flash Image (MUCH FASTER than 3 Pro!)...');
     console.log(`📝 Prompt: ${imagePrompt.substring(0, 100)}...`);
