@@ -22,7 +22,7 @@ export async function generateLetter(data: any) {
 
       Generate TWO things in JSON format:
       {
-        "letter": "A heartfelt Eid greeting in Bahasa Indonesia (40-60 words max). Write it in an elegant, poetic style with beautiful Indonesian phrasing.",
+        "letter": "A heartfelt Eid greeting in Bahasa Indonesia (maximum 3 short sentences). Write it in an elegant, poetic style with beautiful Indonesian phrasing. Keep it concise and impactful.",
         "imagePrompt": "A beautiful Ramadan background with elegant Islamic calligraphy style, ornate patterns, warm golden colors, mosque silhouettes, crescent moon. Include decorative borders with traditional Islamic geometric patterns. (max 40 words)"
       }
 
@@ -85,11 +85,32 @@ Design requirements:
 
     const startTime = Date.now();
 
-    // Use Gemini 3 Pro Image Preview (Nano Banana) for image generation
-    const result = await geminiGenerateImage(enhancedPrompt, {
-      imageSize: '1K', // 1K for faster generation, can be '2K' or '4K' for higher quality
-      aspectRatio: '9:16', // Portrait mode for letter background
-    });
+    // Use Gemini 3 Pro Image Preview with retry logic for intermittent failures
+    const MAX_RETRIES = 3;
+    let result;
+    let lastError;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🎯 Attempt ${attempt}/${MAX_RETRIES}...`);
+        result = await geminiGenerateImage(enhancedPrompt, {
+          imageSize: '1K',
+          aspectRatio: '9:16',
+        });
+        break; // Success, exit retry loop
+      } catch (retryError) {
+        lastError = retryError;
+        console.warn(`⚠️  Attempt ${attempt} failed:`, retryError instanceof Error ? retryError.message : retryError);
+        if (attempt < MAX_RETRIES) {
+          console.log(`⏳ Retrying in 1 second...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+
+    if (!result) {
+      throw lastError || new Error('Image generation failed after all retries');
+    }
 
     const imageTime = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`✅ Image generated in ${imageTime}s`);
