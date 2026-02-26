@@ -62,7 +62,7 @@ export async function generateText(
 }
 
 /**
- * Generate images using Gemini 3 Pro Image Preview (Nano Banana)
+ * Generate images using Gemini 3 Pro Image Preview
  */
 export async function generateImage(
   prompt: string,
@@ -73,11 +73,12 @@ export async function generateImage(
   }
 ): Promise<{ imageUrl: string; base64Data: string; mimeType: string }> {
   const config: any = {
-    responseModalities: ['IMAGE', 'TEXT'],
     imageConfig: {
       aspectRatio: options?.aspectRatio || '9:16',
       imageSize: options?.imageSize || '1K',
+      personGeneration: 'ALLOW_ADULT',
     },
+    responseModalities: ['IMAGE', 'TEXT'],
   };
 
   const model = 'gemini-3-pro-image-preview';
